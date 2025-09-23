@@ -1,0 +1,155 @@
+/* 页面容器样式 */
+.index-container {
+  /* 宽度占满整个父容器 */
+  width: 100%;
+  /* 最小高度为100%，确保内容少时也能占满屏幕 */
+  min-height: 100%;
+  /* 内边距，让内容与边缘有一定距离 */
+  padding: 20px;
+  /* 确保padding不会增加元素总宽度 */
+  box-sizing: border-box;
+  /* 浅灰绿色背景，与整体系统风格协调 */
+  background-color: #f8faf7;
+}
+
+/* 图片容器样式 */
+.hero-image-wrapper {
+  /* 相对定位，用于标语的绝对定位 */
+  position: relative;
+  /* 宽度占满父容器 */
+  width: 100%;
+  /* 最大宽度限制，在大屏幕上不会太宽 */
+  max-width: 1200px;
+  /* 水平居中 */
+  margin: 0 auto;
+  /* 圆角边框，使图片边角更柔和 */
+  border-radius: 12px;
+  /* 隐藏超出容器的部分（配合圆角使用） */
+  overflow: hidden;
+  /* 阴影效果，增加立体感 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  /* 过渡效果，用于悬停动画 */
+  transition: transform 0.3s ease;
+}
+
+/* 鼠标悬停效果 */
+.hero-image-wrapper:hover {
+  /* 向上移动5px，增加交互感 */
+  transform: translateY(-5px);
+}
+
+/* 主图片样式 */
+.hero-image {
+  /* 宽度占满容器 */
+  width: 100%;
+  /* 高度自动，保持图片原有比例 */
+  height: auto;
+  /* 最大高度限制，防止图片过高 */
+  max-height: 600px;
+  /* 图片裁剪方式，保持比例并覆盖容器 */
+  object-fit: cover;
+  /* 块级元素，消除底部间隙 */
+  display: block;
+}
+
+/* 标语容器样式 */
+.slogan-container {
+  /* 渐变背景，从底部深色渐变到透明，增强文字可读性 */
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 100%);
+  /* 文字颜色为白色 */
+  color: white;
+  /* 文字居中对齐 */
+  text-align: center;
+  /* 内边距，上下大一些，左右小一些 */
+  padding: 40px 20px 20px;
+  /* 绝对定位，固定在图片底部 */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* 主标语样式 */
+.main-slogan {
+  /* 字体大小 */
+  font-size: 28px;
+  /* 外边距，上下为0，底部10px */
+  margin: 0 0 10px;
+  /* 字体选择，楷体突出文化感 */
+  font-family: "楷体", "KaiTi", serif;
+  /* 文字阴影，增强立体感 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 副标题样式 */
+.sub-slogan {
+  /* 字体大小 */
+  font-size: 16px;
+  /* 外边距为0 */
+  margin: 0;
+  /* 透明度稍低，与主标语区分层次 */
+  opacity: 0.9;
+  /* 字体选择 */
+  font-family: "宋体", "SimSun", serif;
+}
+
+/* 介绍卡片样式 */
+.intro-card {
+  /* 最大宽度限制 */
+  max-width: 1200px;
+  /* 水平居中，顶部外边距30px */
+  margin: 30px auto 0;
+  /* 内边距 */
+  padding: 25px;
+  /* 白色背景 */
+  background-color: white;
+  /* 圆角边框 */
+  border-radius: 10px;
+  /* 轻微阴影 */
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  /* 左侧绿色装饰条，呼应系统主题色 */
+  border-left: 4px solid #1a5e38;
+}
+
+/* 介绍文字样式 */
+.intro-text {
+  /* 文字颜色 */
+  color: #333;
+  /* 行高，增强可读性 */
+  line-height: 1.8;
+  /* 字体大小 */
+  font-size: 16px;
+  /* 外边距为0 */
+  margin: 0;
+  /* 文字两端对齐 */
+  text-align: justify;
+}
+
+/* 响应式调整 - 针对手机等小屏幕设备 */
+@media (max-width: 768px) {
+  .index-container {
+    /* 减小内边距 */
+    padding: 10px;
+  }
+  
+  .main-slogan {
+    /* 减小字体大小 */
+    font-size: 22px;
+  }
+  
+  .sub-slogan {
+    /* 减小字体大小 */
+    font-size: 14px;
+  }
+  
+  .intro-card {
+    /* 减小内边距和顶部外边距 */
+    padding: 15px;
+    margin-top: 20px;
+  }
+  
+  .intro-text {
+    /* 减小字体大小 */
+    font-size: 14px;
+  }
+}
