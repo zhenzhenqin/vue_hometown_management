@@ -10,6 +10,7 @@ export const listAllAttractions = (name, location, score, page, pageSize) => {
   params.append('pageSize', pageSize);
   return request.get(`/attractions?${params.toString()}`);
 };
+
 // 新增景区
 export const addAttraction = (attraction) => {
   return request.post('/attractions', attraction);

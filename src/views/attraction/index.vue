@@ -316,7 +316,7 @@ const batchDeleteAtt = async () => {  // 修正方法名
         <el-table-column prop="location" label="位置" width="200" align="center" />
 
         <!-- 图片展示 -->
-        <el-table-column prop="image" label="图片" width="140" align="center">
+        <el-table-column prop="image" label="图片" width="120" align="center">
           <template #default="scope">
             <div class="image-container">
               <img v-if="scope.row.image" :src="scope.row.image" alt="景区图片" class="attr-image" loading="lazy" />
@@ -325,7 +325,9 @@ const batchDeleteAtt = async () => {  // 修正方法名
           </template>
         </el-table-column>
 
-        <el-table-column prop="score" label="评分" width="140" align="center" />
+        <el-table-column prop="score" label="评分" width="70" align="center" />
+        <el-table-column prop="liked" label="点赞数" width="70" align="center" />
+        <el-table-column prop="disliked" label="差评数" width="70" align="center" />
 
         <el-table-column prop="description" label="描述" :min-width="350" align="center" show-overflow-tooltip
           tooltip-effect="dark" />
