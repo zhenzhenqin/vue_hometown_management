@@ -7,6 +7,7 @@ import SpecialtiesView from '@/views/specialties/index.vue'
 import LayoutView from '@/views/layout/index.vue'
 import AttractiontView from '@/views/attraction/index.vue'
 import loginView from '@/views/login/index.vue'
+import AdminListView from '@/views/adminList/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,11 @@ const router = createRouter({
           path: '/admin',
           name: 'admin',
           component: AdminView
+        },
+        {
+          path: '/adminList', 
+          name: 'adminList',
+          component: AdminListView
         },
         {
           path: '/culture',

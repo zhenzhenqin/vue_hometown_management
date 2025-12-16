@@ -169,7 +169,6 @@ const handleLogin = () => {
         refreshCaptcha() // 刷新验证码
       }
     } catch (error) {
-      ElMessage.error(error.msg || '系统繁忙，请稍后重试')
       refreshCaptcha()
     } finally {
       loading.value = false

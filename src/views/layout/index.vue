@@ -2,17 +2,18 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { 
-  Promotion, 
-  User, 
-  Menu, 
-  Document, 
-  Chicken, 
-  LocationFilled, 
-  CaretBottom, 
+import {
+  Promotion,
+  User,
+  Menu,
+  Document,
+  Chicken,
+  LocationFilled,
+  CaretBottom,
   SwitchButton, // 退出图标
   Lock,         // 锁图标
-  UserFilled
+  UserFilled,
+  Setting
 } from '@element-plus/icons-vue'
 import { getUserInfo, clearAuth, getUserId } from '@/utils/auth'
 import { updatePassword } from '@/api/admin' // 引入刚才定义的接口
@@ -20,17 +21,17 @@ import { updatePassword } from '@/api/admin' // 引入刚才定义的接口
 const router = useRouter()
 const username = ref('管理员')
 
+//获取管理员信息
+const admin = JSON.parse(localStorage.getItem('adminInfo'))
+const adminId = admin.id;
+
 // 1. 初始化
 onMounted(() => {
   const userInfo = getUserInfo()
-  if (userInfo && userInfo.username) {
-    username.value = userInfo.username
-  }
+  username.value = admin.username
 })
 
-// =======================
 // 下拉菜单指令处理
-// =======================
 const handleCommand = (command) => {
   if (command === 'logout') {
     handleLogout()
@@ -39,9 +40,7 @@ const handleCommand = (command) => {
   }
 }
 
-// =======================
 // 退出登录逻辑
-// =======================
 const handleLogout = () => {
   ElMessageBox.confirm(
     '确定要退出系统吗？',
@@ -55,7 +54,7 @@ const handleLogout = () => {
     clearAuth()
     ElMessage.success('已安全退出')
     router.push('/login')
-  }).catch(() => {})
+  }).catch(() => { })
 }
 
 // =======================
@@ -63,10 +62,6 @@ const handleLogout = () => {
 // =======================
 const passDialogVisible = ref(false)
 const passFormRef = ref(null)
-
-//获取管理员信息
-const admin = JSON.parse(localStorage.getItem('adminInfo'))
-const adminId = admin.id;
 
 const passForm = reactive({
   oldPassword: '',
@@ -113,7 +108,7 @@ const openPasswordDialog = () => {
 // 提交修改
 const submitPassword = () => {
   if (!passFormRef.value) return
-  
+
   passFormRef.value.validate(async (valid) => {
     if (valid) {
       try {
@@ -122,9 +117,9 @@ const submitPassword = () => {
           oldPassword: passForm.oldPassword,
           newPassword: passForm.newPassword
         }
-        
+
         const res = await updatePassword(params)
-        
+
         if (res.code === 1) {
           ElMessage.success('密码修改成功，请重新登录')
           passDialogVisible.value = false
@@ -162,16 +157,22 @@ const handleClose = (key, keyPath) => console.log(key, keyPath)
             <span class="el-dropdown-link">
               <el-avatar :size="32" class="user-avatar" :icon="UserFilled" />
               <span class="username-text">{{ username }}</span>
-              <el-icon class="el-icon--right"><CaretBottom /></el-icon>
+              <el-icon class="el-icon--right">
+                <CaretBottom />
+              </el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu class="custom-dropdown">
                 <el-dropdown-item command="password">
-                  <el-icon><Lock /></el-icon>修改密码
+                  <el-icon>
+                    <Lock />
+                  </el-icon>修改密码
                 </el-dropdown-item>
-                
+
                 <el-dropdown-item divided command="logout" class="logout-item">
-                  <el-icon><SwitchButton /></el-icon>退出登录
+                  <el-icon>
+                    <SwitchButton />
+                  </el-icon>退出登录
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -183,26 +184,54 @@ const handleClose = (key, keyPath) => console.log(key, keyPath)
         <el-aside width="200px" class="aside">
           <el-menu router default-active="/index" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
             <el-menu-item index="/index">
-              <el-icon><Promotion /></el-icon>
+              <el-icon>
+                <Promotion />
+              </el-icon>
               <span>首页</span>
             </el-menu-item>
+
             <el-menu-item index="/admin">
-              <el-icon><User /></el-icon>
+              <el-icon>
+                <User />
+              </el-icon>
               <span>个人信息</span>
             </el-menu-item>
+
             <el-sub-menu index="/manage1">
               <template #title>
-                <el-icon><Menu /></el-icon>
+                <el-icon>
+                  <Menu />
+                </el-icon>
                 <span>信息介绍</span>
               </template>
               <el-menu-item index="/culture">
-                <el-icon><Document /></el-icon>文化模块
+                <el-icon>
+                  <Document />
+                </el-icon>文化模块
               </el-menu-item>
               <el-menu-item index="/specialties">
-                <el-icon><Chicken /></el-icon>特产模块
+                <el-icon>
+                  <Chicken />
+                </el-icon>特产模块
               </el-menu-item>
               <el-menu-item index="/attraction">
-                <el-icon><LocationFilled /></el-icon>景点模块
+                <el-icon>
+                  <LocationFilled />
+                </el-icon>景点模块
+              </el-menu-item>
+            </el-sub-menu>
+
+            <el-sub-menu index="/system">
+              <template #title>
+                <el-icon>
+                  <Setting />
+                </el-icon> <span>系统管理</span>
+              </template>
+
+              <el-menu-item index="/adminList">
+                <el-icon>
+                  <UserFilled />
+                </el-icon> 管理员列表
               </el-menu-item>
             </el-sub-menu>
           </el-menu>
@@ -214,44 +243,18 @@ const handleClose = (key, keyPath) => console.log(key, keyPath)
       </el-container>
     </el-container>
 
-    <el-dialog
-      v-model="passDialogVisible"
-      title="修改密码"
-      width="500px"
-      :close-on-click-modal="false"
-      center
-      destroy-on-close
-    >
-      <el-form
-        ref="passFormRef"
-        :model="passForm"
-        :rules="passRules"
-        label-width="100px"
-        style="padding-right: 20px; padding-top: 10px;"
-      >
+    <el-dialog v-model="passDialogVisible" title="修改密码" width="500px" :close-on-click-modal="false" center
+      destroy-on-close>
+      <el-form ref="passFormRef" :model="passForm" :rules="passRules" label-width="100px"
+        style="padding-right: 20px; padding-top: 10px;">
         <el-form-item label="旧密码" prop="oldPassword">
-          <el-input 
-            v-model="passForm.oldPassword" 
-            type="password" 
-            show-password 
-            placeholder="请输入当前使用的密码"
-          />
+          <el-input v-model="passForm.oldPassword" type="password" show-password placeholder="请输入当前使用的密码" />
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input 
-            v-model="passForm.newPassword" 
-            type="password" 
-            show-password 
-            placeholder="请输入新密码（6-20位）"
-          />
+          <el-input v-model="passForm.newPassword" type="password" show-password placeholder="请输入新密码（6-20位）" />
         </el-form-item>
         <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input 
-            v-model="passForm.confirmPassword" 
-            type="password" 
-            show-password 
-            placeholder="请再次输入新密码"
-          />
+          <el-input v-model="passForm.confirmPassword" type="password" show-password placeholder="请再次输入新密码" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -314,11 +317,13 @@ const handleClose = (key, keyPath) => console.log(key, keyPath)
   transition: all 0.3s;
   padding: 6px 12px;
   border-radius: 30px;
-  background-color: rgba(255, 255, 255, 0.1); /* 默认微弱背景 */
+  background-color: rgba(255, 255, 255, 0.1);
+  /* 默认微弱背景 */
 }
 
 .el-dropdown-link:hover {
-  background-color: rgba(255, 255, 255, 0.25); /* 悬停加深 */
+  background-color: rgba(255, 255, 255, 0.25);
+  /* 悬停加深 */
 }
 
 .user-avatar {
@@ -390,8 +395,10 @@ el-main {
 }
 
 :global(.logout-item) {
-  color: #f56c6c; /* 退出按钮设为红色警告色 */
+  color: #f56c6c;
+  /* 退出按钮设为红色警告色 */
 }
+
 :global(.logout-item:hover) {
   background-color: #fef0f0 !important;
   color: #f56c6c !important;

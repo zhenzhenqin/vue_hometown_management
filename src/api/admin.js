@@ -32,15 +32,6 @@ export const getAdmin = () => {
   return request.get('/admin');
 }
 
-//根据id回显管理员信息
-export const getAdminById = (id) => {
-  return request.get(`/admin/${id}`);
-}
-
-//修改管理员
-export const updateAdmin = (admin) => {
-  return request.put('/admin', admin);
-}
 
 /**
  * 修改密码
@@ -51,5 +42,50 @@ export const updatePassword = (data) => {
     url: '/admin/editPassword',
     method: 'put',
     data
+  })
+}
+
+// 分页条件查询管理员
+export const getAdminList = (params) => {
+  return request({
+    url: '/admin/query',
+    method: 'get',
+    params
+  })
+}
+
+// 新增管理员
+export const addAdmin = (data) => {
+  return request({
+    url: '/admin',
+    method: 'post',
+    data
+  })
+}
+
+//  根据ID获取管理员详情 (回显用)
+export const getAdminById = (id) => {
+  return request({
+    url: `/admin/${id}`,
+    method: 'get'
+  })
+}
+
+//  更新管理员信息
+export const updateAdmin = (data) => {
+  return request({
+    url: '/admin',
+    method: 'put',
+    data
+  })
+}
+
+//  启用/禁用管理员
+// 接口: /admin/status/{status}?id={id}
+export const changeAdminStatus = (status, id) => {
+  return request({
+    url: `/admin/status/${status}`,
+    method: 'post',
+    params: { id }
   })
 }
