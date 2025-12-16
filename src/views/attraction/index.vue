@@ -157,7 +157,7 @@ const rules = ref({
   ],
   score: [
     { required: true, message: '请输入评分', trigger: 'blur' },
-    { 
+    {
       validator: (rule, value, callback) => {
         if (value !== null && value !== '') {
           const num = parseFloat(value);
@@ -315,7 +315,15 @@ const batchDeleteAtt = async () => {  // 修正方法名
         <el-table-column prop="name" label="景区名称" width="160" align="center" />
         <el-table-column prop="location" label="位置" width="200" align="center" />
 
-        
+        <!-- 图片展示 -->
+        <el-table-column prop="image" label="图片" width="140" align="center">
+          <template #default="scope">
+            <div class="image-container">
+              <img v-if="scope.row.image" :src="scope.row.image" alt="景区图片" class="attr-image" loading="lazy" />
+              <el-icon v-else class="default-image-icon">Picture</el-icon>
+            </div>
+          </template>
+        </el-table-column>
 
         <el-table-column prop="score" label="评分" width="140" align="center" />
 
@@ -367,8 +375,22 @@ const batchDeleteAtt = async () => {  // 修正方法名
             maxlength="500" show-word-limit class="form-textarea" />
         </el-form-item>
 
-        
-      </el-form> 
+        <!-- 上传图片 -->
+        <el-form-item label="上传图片" class="form-item">
+          <el-upload class="avatar-uploader" action="/api/upload" :show-file-list="false"
+            :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :disabled="false">
+            <div class="upload-container">
+              <img v-if="attr.image" :src="attr.image" class="upload-avatar" alt="预览图" loading="lazy" />
+              <div v-else class="upload-placeholder">
+                <el-icon class="upload-icon">Plus</el-icon>
+                <p class="upload-text">点击上传图片</p>
+              </div>
+            </div>
+          </el-upload>
+          <p class="upload-hint">支持JPG/PNG格式，大小不超过10MB</p>
+        </el-form-item>
+
+      </el-form>
 
       <template #footer>
         <div class="dialog-footer">

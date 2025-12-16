@@ -24,7 +24,7 @@
               <span>首页</span>
             </el-menu-item>
 
-            <el-menu-item index="/user">
+            <el-menu-item index="/admin">
               <el-icon>
                 <User />
               </el-icon>

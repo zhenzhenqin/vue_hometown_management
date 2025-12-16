@@ -186,7 +186,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, toRefs, watch, computed } from 'vue';
-import { getUser, updateUser } from '@/api/user';
+import { getAdmin, updateAdmin } from '@/api/admin';
 import { User, Edit, Refresh, Message, Document } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
@@ -302,7 +302,7 @@ const fetchUserInfo = async () => {
   state.error = null;
   
   try {
-    const response = await getUser();
+    const response = await getAdmin();
     if (response.code) {
       state.user = { ...response.data };
     } else {
@@ -322,7 +322,7 @@ const submitForm = async () => {
   try {
     await formRef.value.validate();
     
-    const response = await updateUser(state.form);
+    const response = await updateAdmin(state.form);
     if (response.code) {
       ElMessage.success('信息更新成功');
       state.user = { ...state.form };
