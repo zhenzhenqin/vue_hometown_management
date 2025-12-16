@@ -53,7 +53,7 @@ const router = createRouter({
 })
 
 /* 路由守卫 */
-/* router.beforeEach((to, from, next) => {
+router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   
   // 1. 如果去的是登录页，且已经有token，直接跳首页
@@ -69,6 +69,6 @@ const router = createRouter({
   else {
     next()
   }
-}) */
+})
 
 export default router

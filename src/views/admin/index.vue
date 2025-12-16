@@ -186,7 +186,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, toRefs, watch, computed } from 'vue';
-import { getAdmin, updateAdmin } from '@/api/admin';
+import { getAdmin, getAdminById, updateAdmin } from '@/api/admin';
 import { User, Edit, Refresh, Message, Document } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
@@ -300,9 +300,13 @@ const formatDateTime = (dateTime) => {
 const fetchUserInfo = async () => {
   state.loading = true;
   state.error = null;
+
+  //从本地存储中获取用户信息
+  const adminInfo = JSON.parse(localStorage.getItem('adminInfo'));
+  const id = adminInfo.id;
   
   try {
-    const response = await getAdmin();
+    const response = await getAdminById(id);
     if (response.code) {
       state.user = { ...response.data };
     } else {
