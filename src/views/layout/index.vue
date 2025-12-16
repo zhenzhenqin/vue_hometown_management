@@ -1,20 +1,92 @@
 <script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessageBox, ElMessage } from 'element-plus'
+import { 
+  Promotion, 
+  User, 
+  Menu, 
+  Document, 
+  Chicken, 
+  LocationFilled, 
+  CaretBottom, // 下拉箭头图标
+  SwitchButton // 退出按钮图标
+} from '@element-plus/icons-vue'
+import { getUserInfo, clearAuth } from '@/utils/auth' // 引入之前封装的工具
 
+const router = useRouter()
+const username = ref('管理员') // 默认显示，获取数据后会覆盖
+
+// 1. 初始化时获取当前登录用户信息
+onMounted(() => {
+  const userInfo = getUserInfo()
+  if (userInfo && userInfo.username) {
+    username.value = userInfo.username
+  }
+})
+
+// 2. 退出登录处理函数
+const handleLogout = () => {
+  ElMessageBox.confirm(
+    '确定要退出系统吗？',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(() => {
+    // 执行退出逻辑
+    clearAuth() // 清除 token 和 info
+    localStorage.clear() // 清除本地存储
+    ElMessage.success('已安全退出')
+    router.push('/login') // 跳转回登录页
+  }).catch(() => {
+    // 取消退出，不做操作
+  })
+}
+
+// 菜单处理（保持原样）
+const handleOpen = (key, keyPath) => {
+  console.log(key, keyPath)
+}
+const handleClose = (key, keyPath) => {
+  console.log(key, keyPath)
+}
 </script>
 
 <template>
   <div class="common-layout">
     <el-container>
-      <!-- Header 区域 -->
       <el-header class="header">
-        <span class="title">衢州地区信息管理系统</span>
-        <div class="subtitle">南孔圣地 · 衢州有礼</div>
+        <div class="header-left">
+          <span class="title">衢州地区信息管理系统</span>
+          <div class="subtitle">南孔圣地 · 衢州有礼</div>
+        </div>
+
+        <div class="header-right">
+          <el-dropdown trigger="click">
+            <span class="el-dropdown-link">
+              <el-avatar :size="32" class="user-avatar" icon="UserFilled" />
+              <span class="username-text">{{ username }}</span>
+              <el-icon class="el-icon--right">
+                <CaretBottom />
+              </el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="handleLogout">
+                  <el-icon><SwitchButton /></el-icon>退出登录
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </el-header>
 
       <el-container>
-        <!-- 左侧菜单 -->
         <el-aside width="200px" class="aside">
-          <el-menu router='true' default-active="2" class="el-menu-vertical-demo" @open="handleOpen"
+          <el-menu router default-active="/index" class="el-menu-vertical-demo" @open="handleOpen"
             @close="handleClose">
 
             <el-menu-item index="/index">
@@ -70,17 +142,26 @@
 </template>
 
 <style scoped>
+/* Header 样式重构为 Flex 布局 */
 .header {
   background-image: linear-gradient(to right, #1a5e38, #2a8c54, #3aad6e, #56c886, #74e49f);
   padding: 0 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex; /* 开启 Flex */
+  justify-content: space-between; /* 左右贴边 */
+  align-items: center; /* 垂直居中 */
+  height: 60px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
 }
 
 .title {
   color: white;
-  font-size: 28px;
+  font-size: 24px; /*稍微调小一点，适配不同屏幕*/
   font-family: "楷体", "KaiTi", serif;
-  line-height: 60px;
   font-weight: bolder;
   margin-right: 20px;
 }
@@ -89,28 +170,45 @@
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
   font-family: "宋体", "SimSun", serif;
-  line-height: 60px;
   border-left: 1px solid rgba(255, 255, 255, 0.3);
   padding-left: 15px;
+  height: 24px;
+  line-height: 24px;
 }
 
-.right_tool {
-  float: right;
-  line-height: 60px;
+/* 右侧用户区域样式 */
+.header-right {
+  display: flex;
+  align-items: center;
 }
 
-a {
-  color: white;
-  text-decoration: none;
-  margin-left: 15px;
+.el-dropdown-link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #fff;
   transition: all 0.3s;
+  padding: 5px 10px;
+  border-radius: 20px;
 }
 
-a:hover {
-  color: #e6f7ff;
-  text-decoration: underline;
+.el-dropdown-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
+.user-avatar {
+  background-color: #fff;
+  color: #1a5e38;
+  margin-right: 8px;
+}
+
+.username-text {
+  font-size: 16px;
+  font-weight: 500;
+  margin-right: 5px;
+}
+
+/* 侧边栏样式 */
 .aside {
   width: 220px;
   background-color: #f9fbf8;
@@ -118,7 +216,6 @@ a:hover {
   height: calc(100vh - 60px);
 }
 
-/* 菜单样式调整 */
 ::v-deep .el-menu-vertical-demo {
   background-color: #f9fbf8;
   border-right: none;
