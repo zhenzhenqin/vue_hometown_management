@@ -150,7 +150,7 @@ const handleLogin = () => {
       const res = await login(loginForm.value)
       if (res.code === 1) {
         ElMessage.success({
-          message: '登录成功，欢迎回来！',
+          message: '登录成功，欢迎' + loginForm.value.username + '！',
           type: 'success',
           plain: true,
         })
@@ -166,10 +166,10 @@ const handleLogin = () => {
         router.push('/index')
       } else {
         ElMessage.error(res.msg || '登录失败，请检查输入')
-        refreshCaptcha() // 失败刷新验证码
+        refreshCaptcha() // 刷新验证码
       }
     } catch (error) {
-      ElMessage.error(error.message || '系统繁忙，请稍后重试')
+      ElMessage.error(error.msg || '系统繁忙，请稍后重试')
       refreshCaptcha()
     } finally {
       loading.value = false

@@ -41,3 +41,15 @@ export const getAdminById = (id) => {
 export const updateAdmin = (admin) => {
   return request.put('/admin', admin);
 }
+
+/**
+ * 修改密码
+ * @param {Object} data { adminId, oldPassword, newPassword }
+ */
+export const updatePassword = (data) => {
+  return request({
+    url: '/admin/editPassword',
+    method: 'put',
+    data
+  })
+}
