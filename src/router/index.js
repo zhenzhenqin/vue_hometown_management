@@ -8,6 +8,7 @@ import LayoutView from '@/views/layout/index.vue'
 import AttractiontView from '@/views/attraction/index.vue'
 import loginView from '@/views/login/index.vue'
 import AdminListView from '@/views/adminList/index.vue'
+import SchoolView from '@/views/school/index.vue' 
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
           path: '/index',
           name: 'index',
           component: HomeView
+        },
+        {
+          path: '/school',
+          name: 'school',
+          component: SchoolView
         },
         {
           path: '/admin',
