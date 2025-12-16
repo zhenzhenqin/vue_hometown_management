@@ -96,7 +96,7 @@ const highlights = ref([
         <el-descriptions-item label="后端核心"><el-tag type="success">Spring Boot 3</el-tag></el-descriptions-item>
         <el-descriptions-item label="数据库">MySQL 8.0</el-descriptions-item>
         <el-descriptions-item label="持久层">MyBatis + PageHelper</el-descriptions-item>
-        <el-descriptions-item label="缓存"><el-tag type="danger" effect="dark">Redis</el-tag></el-descriptions-item>
+        <el-descriptions-item label="缓存中间件"><el-tag type="danger" effect="dark">Redis</el-tag></el-descriptions-item>
         <el-descriptions-item label="对象存储">阿里云 OSS</el-descriptions-item>
         <el-descriptions-item label="接口文档">Knife4j</el-descriptions-item>
       </el-descriptions>

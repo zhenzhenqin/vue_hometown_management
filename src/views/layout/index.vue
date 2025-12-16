@@ -1,22 +1,23 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { 
-  Promotion, 
-  User, 
-  Menu, 
-  Document, 
-  Chicken, 
-  LocationFilled, 
-  CaretBottom, 
-  SwitchButton, 
-  Lock,         
+import {
+  Promotion,
+  User,
+  Menu,
+  Document,
+  Chicken,
+  LocationFilled,
+  CaretBottom,
+  SwitchButton,
+  Lock,
   UserFilled,
   Setting,
-  School 
+  School
 } from '@element-plus/icons-vue'
-import { updatePassword } from '@/api/admin' 
+import { updatePassword } from '@/api/admin'
+import { getUserInfo, clearAuth } from '@/utils/auth' // 确保引入这些工具函数
 
 const router = useRouter()
 
@@ -29,14 +30,30 @@ const footerInfo = ref({
 })
 
 // 获取管理员ID (用于修改密码)
-const admin = JSON.parse(localStorage.getItem('adminInfo')) //获取到存储的管理员信息
-
 const adminId = ref(null)
-const username = ref(null)
+const username = ref('管理员')
 
+// 1. 初始化
 onMounted(() => {
-  adminId.value = admin.id;
-  username.value = admin.username;
+  // 建议使用你在 utils/auth.js 中封装好的 getUserInfo，或者保持你原有的逻辑
+  // 这里做一个兼容处理，防止 localStorage 为空报错
+  try {
+    const adminStr = localStorage.getItem('adminInfo')
+    if (adminStr) {
+      const admin = JSON.parse(adminStr)
+      adminId.value = admin.id
+      username.value = admin.username
+    } else {
+      // 如果本地没有存储，尝试从 auth 工具获取或重定向
+      const userInfo = getUserInfo()
+      if (userInfo) {
+        username.value = userInfo.username
+        adminId.value = userInfo.id
+      }
+    }
+  } catch (e) {
+    console.error("获取用户信息失败", e)
+  }
 })
 
 const handleCommand = (command) => {
@@ -48,19 +65,20 @@ const handleCommand = (command) => {
 }
 
 const handleLogout = () => {
-  ElMessageBox.confirm('确定要退出系统吗？','提示',{
-      confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning',
+  ElMessageBox.confirm('确定要退出系统吗？', '提示', {
+    confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning',
   }).then(() => {
-    localStorage.clear() // 清除所有本地存储的认证信息
+    // 建议使用 clearAuth() 如果你封装了的话，或者手动清除
+    localStorage.clear()
     ElMessage.success('已安全退出')
     router.push('/login')
-  }).catch(() => {})
+  }).catch(() => { })
 }
 
 // 修改密码逻辑
 const passDialogVisible = ref(false)
 const passFormRef = ref(null)
-const passForm = ref({ oldPassword:'', newPassword:'', confirmPassword:'' })
+const passForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' })
 
 const validatePass2 = (rule, value, callback) => {
   if (value === '') { callback(new Error('请再次输入密码')) }
@@ -93,7 +111,7 @@ const submitPassword = () => {
         if (res.code === 1) {
           ElMessage.success('密码修改成功，请重新登录')
           passDialogVisible.value = false
-          clearAuth()
+          localStorage.clear() // 强制登出
           router.push('/login')
         } else {
           ElMessage.error(res.msg || '修改失败')
@@ -107,7 +125,7 @@ const submitPassword = () => {
 <template>
   <div class="common-layout">
     <el-container class="outer-container">
-      
+
       <el-header class="header">
         <div class="header-left">
           <span class="title">衢州地区信息管理系统</span>
@@ -115,16 +133,32 @@ const submitPassword = () => {
         </div>
 
         <div class="header-right">
+          <el-tooltip content="访问 GitHub 源码仓库" placement="bottom" effect="light">
+            <a href="https://github.com/zhenzhenqin/hometown" target="_blank" class="github-link">
+              <svg height="28" viewBox="0 0 16 16" version="1.1" width="28" aria-hidden="true" style="fill: white;">
+                <path fill-rule="evenodd"
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+                </path>
+              </svg>
+            </a>
+          </el-tooltip>
+
           <el-dropdown trigger="click" @command="handleCommand">
             <span class="el-dropdown-link">
               <el-avatar :size="32" class="user-avatar" :icon="UserFilled" />
               <span class="username-text">{{ username }}</span>
-              <el-icon class="el-icon--right"><CaretBottom /></el-icon>
+              <el-icon class="el-icon--right">
+                <CaretBottom />
+              </el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu class="custom-dropdown">
-                <el-dropdown-item command="password"><el-icon><Lock /></el-icon>修改密码</el-dropdown-item>
-                <el-dropdown-item divided command="logout" class="logout-item"><el-icon><SwitchButton /></el-icon>退出登录</el-dropdown-item>
+                <el-dropdown-item command="password"><el-icon>
+                    <Lock />
+                  </el-icon>修改密码</el-dropdown-item>
+                <el-dropdown-item divided command="logout" class="logout-item"><el-icon>
+                    <SwitchButton />
+                  </el-icon>退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -134,36 +168,60 @@ const submitPassword = () => {
       <el-container class="inner-container">
         <el-aside width="220px" class="aside">
           <el-menu router default-active="/index" class="el-menu-vertical-demo">
-            
+
             <el-menu-item index="/index">
-              <el-icon><Promotion /></el-icon>
+              <el-icon>
+                <Promotion />
+              </el-icon>
               <span>首页</span>
             </el-menu-item>
 
             <el-menu-item index="/school">
-              <el-icon><School /></el-icon>
+              <el-icon>
+                <School />
+              </el-icon>
               <span>学校展示</span>
             </el-menu-item>
 
             <el-menu-item index="/admin">
-              <el-icon><User /></el-icon>
+              <el-icon>
+                <User />
+              </el-icon>
               <span>个人信息</span>
             </el-menu-item>
 
             <el-sub-menu index="/manage1">
               <template #title>
-                <el-icon><Menu /></el-icon><span>信息介绍</span>
+                <el-icon>
+                  <Menu />
+                </el-icon><span>信息介绍</span>
               </template>
-              <el-menu-item index="/culture"><el-icon><Document /></el-icon>文化模块</el-menu-item>
-              <el-menu-item index="/specialties"><el-icon><Chicken /></el-icon>特产模块</el-menu-item>
-              <el-menu-item index="/attraction"><el-icon><LocationFilled /></el-icon>景点模块</el-menu-item>
+              <el-menu-item index="/culture"><el-icon>
+                  <Document />
+                </el-icon>文化模块</el-menu-item>
+              <el-menu-item index="/specialties"><el-icon>
+                  <Chicken />
+                </el-icon>特产模块</el-menu-item>
+              <el-menu-item index="/attraction"><el-icon>
+                  <LocationFilled />
+                </el-icon>景点模块</el-menu-item>
             </el-sub-menu>
 
             <el-sub-menu index="/system">
               <template #title>
-                <el-icon><Setting /></el-icon><span>系统管理</span>
+                <el-icon>
+                  <Setting />
+                </el-icon><span>系统管理</span>
               </template>
-              <el-menu-item index="/adminList"><el-icon><UserFilled /></el-icon>管理员列表</el-menu-item>
+              <el-menu-item index="/adminList"><el-icon>
+                  <UserFilled />
+                </el-icon>管理员列表</el-menu-item>
+
+              <el-menu-item index="/user">
+                <el-icon>
+                  <User />
+                </el-icon>用户列表
+              </el-menu-item>
             </el-sub-menu>
           </el-menu>
         </el-aside>
@@ -191,8 +249,10 @@ const submitPassword = () => {
       </el-container>
     </el-container>
 
-    <el-dialog v-model="passDialogVisible" title="修改密码" width="500px" :close-on-click-modal="false" center destroy-on-close>
-      <el-form ref="passFormRef" :model="passForm" :rules="passRules" label-width="100px" style="padding-right: 20px; padding-top: 10px;">
+    <el-dialog v-model="passDialogVisible" title="修改密码" width="500px" :close-on-click-modal="false" center
+      destroy-on-close>
+      <el-form ref="passFormRef" :model="passForm" :rules="passRules" label-width="100px"
+        style="padding-right: 20px; padding-top: 10px;">
         <el-form-item label="旧密码" prop="oldPassword">
           <el-input v-model="passForm.oldPassword" type="password" show-password placeholder="请输入当前使用的密码" />
         </el-form-item>
@@ -225,25 +285,88 @@ const submitPassword = () => {
   align-items: center;
   height: 60px;
 }
-.header-left { display: flex; align-items: center; }
-.title { color: white; font-size: 24px; font-weight: bolder; margin-right: 20px; font-family: "楷体"; }
-.subtitle { color: rgba(255,255,255,0.9); font-size: 16px; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 15px; height: 24px; line-height: 24px; }
-.header-right { display: flex; align-items: center; }
-.el-dropdown-link { cursor: pointer; display: flex; align-items: center; color: #fff; padding: 6px 12px; border-radius: 30px; background-color: rgba(255, 255, 255, 0.1); }
-.el-dropdown-link:hover { background-color: rgba(255, 255, 255, 0.25); }
-.user-avatar { background-color: #fff; color: #1a5e38; margin-right: 10px; }
-.username-text { font-size: 16px; font-weight: 600; margin-right: 5px; }
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  color: white;
+  font-size: 24px;
+  font-weight: bolder;
+  margin-right: 20px;
+  font-family: "楷体";
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  padding-left: 15px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* ⭐ 新增：GitHub 图标样式 ⭐ */
+.github-link {
+  margin-right: 20px;
+  /* 与右侧头像的间距 */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.github-link:hover {
+  opacity: 0.8;
+  /* 鼠标悬停时稍微透明 */
+}
+
+.el-dropdown-link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 30px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.el-dropdown-link:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.user-avatar {
+  background-color: #fff;
+  color: #1a5e38;
+  margin-right: 10px;
+}
+
+.username-text {
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: 5px;
+}
 
 /* 布局调整 - 关键 */
 .outer-container {
-  height: 100vh; /* 占满全屏 */
+  height: 100vh;
+  /* 占满全屏 */
   display: flex;
   flex-direction: column;
 }
 
 .inner-container {
-  flex: 1; /* 占据 Header 剩下的空间 */
-  overflow: hidden; /* 防止双重滚动条 */
+  flex: 1;
+  /* 占据 Header 剩下的空间 */
+  overflow: hidden;
+  /* 防止双重滚动条 */
 }
 
 .aside {
@@ -261,14 +384,17 @@ const submitPassword = () => {
 }
 
 .el-main {
-  flex: 1; /* 撑开剩余空间 */
+  flex: 1;
+  /* 撑开剩余空间 */
   padding: 20px;
-  overflow-y: auto; /* 内容溢出时滚动 */
+  overflow-y: auto;
+  /* 内容溢出时滚动 */
 }
 
 /* 页脚样式 */
 .footer {
-  height: 40px; /* 固定高度 */
+  height: 40px;
+  /* 固定高度 */
   background-color: #fff;
   border-top: 1px solid #e4e7ed;
   display: flex;
@@ -285,12 +411,52 @@ const submitPassword = () => {
 }
 
 /* 菜单样式 */
-::v-deep .el-menu-vertical-demo { border-right: none; background-color: #f9fbf8; }
-::v-deep .el-menu-item, ::v-deep .el-sub-menu__title { color: #333; height: 50px; line-height: 50px; font-size: 15px; }
-::v-deep .el-menu-item:hover, ::v-deep .el-sub-menu__title:hover { background-color: #eaf5e6; color: #1a5e38; }
-::v-deep .el-menu-item.is-active { background-color: #d9ead3; color: #1a5e38; font-weight: bold; }
-::v-deep .el-menu-item.is-active::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background-color: #1a5e38; }
-:global(.custom-dropdown .el-dropdown-menu__item) { padding: 10px 20px; font-size: 14px; }
-:global(.logout-item) { color: #f56c6c; }
-:global(.logout-item:hover) { background-color: #fef0f0 !important; color: #f56c6c !important; }
+::v-deep .el-menu-vertical-demo {
+  border-right: none;
+  background-color: #f9fbf8;
+}
+
+::v-deep .el-menu-item,
+::v-deep .el-sub-menu__title {
+  color: #333;
+  height: 50px;
+  line-height: 50px;
+  font-size: 15px;
+}
+
+::v-deep .el-menu-item:hover,
+::v-deep .el-sub-menu__title:hover {
+  background-color: #eaf5e6;
+  color: #1a5e38;
+}
+
+::v-deep .el-menu-item.is-active {
+  background-color: #d9ead3;
+  color: #1a5e38;
+  font-weight: bold;
+}
+
+::v-deep .el-menu-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: #1a5e38;
+}
+
+:global(.custom-dropdown .el-dropdown-menu__item) {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+:global(.logout-item) {
+  color: #f56c6c;
+}
+
+:global(.logout-item:hover) {
+  background-color: #fef0f0 !important;
+  color: #f56c6c !important;
+}
 </style>

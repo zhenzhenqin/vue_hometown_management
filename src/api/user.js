@@ -14,3 +14,22 @@ export const getUserById = (id) => {
 export const updateUser = (user) => {
   return request.put('/user', user);
 }
+
+// 分页条件查询用户
+export const getUserPage = (params) => {
+  return request({
+    url: '/user/query',
+    method: 'get',
+    params
+  })
+}
+
+// 启用/禁用用户 (拉黑/解除拉黑)
+// 后端接口: POST /user/status/{status}?id={id}
+export const startOrStopUser = (status, id) => {
+  return request({
+    url: `/user/status/${status}`,
+    method: 'post',
+    params: { id }
+  })
+}
