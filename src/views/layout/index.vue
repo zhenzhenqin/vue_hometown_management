@@ -14,15 +14,13 @@ import {
   Lock,         
   UserFilled,
   Setting,
-  School // 1. 新增 School 图标
+  School 
 } from '@element-plus/icons-vue'
-import { getUserInfo, clearAuth } from '@/utils/auth'
 import { updatePassword } from '@/api/admin' 
 
 const router = useRouter()
-const username = ref('管理员')
 
-// 页脚信息 - 请修改为你自己的信息
+// 页脚信息 
 const footerInfo = ref({
   studentId: '23H034160336',
   name: '毛靖晨',
@@ -31,14 +29,14 @@ const footerInfo = ref({
 })
 
 // 获取管理员ID (用于修改密码)
+const admin = JSON.parse(localStorage.getItem('adminInfo')) //获取到存储的管理员信息
+
 const adminId = ref(null)
+const username = ref(null)
 
 onMounted(() => {
-  const userInfo = getUserInfo()
-  if (userInfo && userInfo.username) {
-    username.value = userInfo.username
-    adminId.value = userInfo.id
-  }
+  adminId.value = admin.id;
+  username.value = admin.username;
 })
 
 const handleCommand = (command) => {
@@ -53,15 +51,13 @@ const handleLogout = () => {
   ElMessageBox.confirm('确定要退出系统吗？','提示',{
       confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning',
   }).then(() => {
-    clearAuth()
+    localStorage.clear() // 清除所有本地存储的认证信息
     ElMessage.success('已安全退出')
     router.push('/login')
   }).catch(() => {})
 }
 
-// =======================
-// 修改密码逻辑 (保留你的原有逻辑)
-// =======================
+// 修改密码逻辑
 const passDialogVisible = ref(false)
 const passFormRef = ref(null)
 const passForm = ref({ oldPassword:'', newPassword:'', confirmPassword:'' })
