@@ -367,10 +367,10 @@ const batchDeleteAtt = async () => {  // 修正方法名
           <el-input v-model="attr.location" placeholder="请输入景区位置" class="form-input" />
         </el-form-item>
 
-        <el-form-item label="评分" prop="score" class="form-item">
+        <!-- <el-form-item label="评分" prop="score" class="form-item">
           <el-input v-model="attr.score" type="number" step="0.1" min="0" max="5" placeholder="0-10分"
             class="form-input" />
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item label="景区描述" prop="description" class="form-item">
           <el-input v-model="attr.description" placeholder="请填写景区描述（最多500字）" type="textarea" :rows="6" resize="vertical"

@@ -14,7 +14,8 @@ import {
   Lock,
   UserFilled,
   Setting,
-  School
+  School,
+  DataLine
 } from '@element-plus/icons-vue'
 import { updatePassword } from '@/api/admin'
 import { getUserInfo, clearAuth } from '@/utils/auth' // 确保引入这些工具函数
@@ -222,6 +223,22 @@ const submitPassword = () => {
                   <User />
                 </el-icon>用户列表
               </el-menu-item>
+            </el-sub-menu>
+
+            <el-sub-menu index="/report">
+              <template #title>
+                <el-icon>
+                  <DataLine />
+                </el-icon>
+                <span>数据统计</span>
+              </template>
+
+              <el-menu-item index="/report/dashboard">
+                <el-icon>
+                  <Odometer />
+                </el-icon> <span>驾驶舱概览</span>
+              </el-menu-item>
+
             </el-sub-menu>
           </el-menu>
         </el-aside>
