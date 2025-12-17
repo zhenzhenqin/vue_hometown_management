@@ -11,6 +11,7 @@ import AdminListView from '@/views/adminList/index.vue'
 import SchoolView from '@/views/school/index.vue' 
 import UserView from '@/views/user/index.vue'
 import ReportView from '@/views/report/index.vue'
+import LogView from '@/views/log/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -70,6 +71,11 @@ const router = createRouter({
           path: '/report/dashboard',
           name: 'report',
           component: ReportView
+        },
+        {
+          path: '/log',
+          name: 'log',
+          component: LogView
         }
       ]
     }
