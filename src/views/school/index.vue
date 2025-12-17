@@ -1,6 +1,12 @@
 <script setup>
 import { ref } from 'vue'
-import { Link, Picture, Trophy, School, Star, Cpu } from '@element-plus/icons-vue'
+import { 
+  Link, Picture, Trophy, School, Star, 
+  // 新增技术栈相关图标
+  Monitor, DataLine, Files, Connection, Odometer,
+  // 新增亮点相关图标
+  Lightning, Cloudy, Lock, Document
+} from '@element-plus/icons-vue'
 
 // 本地图片路径 (保持不变)
 const carouselImages = ref([
@@ -9,11 +15,32 @@ const carouselImages = ref([
   { url: '/image/riyuehu.jpg', desc: '日月湖' },
 ])
 
+// 升级亮点数据，加入对应的图标组件
 const highlights = ref([
-  { title: '高性能缓存', desc: '集成 Redis 缓存热点数据，有效降低 MySQL 数据库 I/O 压力。' },
-  { title: '云端存储', desc: '接入阿里云 OSS 对象存储服务，实现海量图片资源的高效分发。' },
-  { title: '安全认证', desc: '采用 JWT 实现无状态单点登录，结合拦截器实现细粒度权限控制。' },
-  { title: '规范接口', desc: '引入 Knife4j + Swagger3 自动生成在线接口文档，开发规范化。' }
+  { 
+    icon: Lightning, 
+    title: '高性能缓存', 
+    desc: '集成 Redis 缓存热点数据，有效降低 MySQL 数据库 I/O 压力，提升响应速度。',
+    color: '#e6a23c' // 橙色系
+  },
+  { 
+    icon: Cloudy, 
+    title: '云端对象存储', 
+    desc: '接入阿里云 OSS 对象存储服务，实现海量图片资源的高效上传与CDN分发。',
+    color: '#409eff' // 蓝色系
+  },
+  { 
+    icon: Lock, 
+    title: 'JWT 安全认证', 
+    desc: '采用 JWT 实现无状态单点登录，结合自定义拦截器实现细粒度权限控制。',
+    color: '#67c23a' // 绿色系
+  },
+  { 
+    icon: Document, 
+    title: '接口规范化', 
+    desc: '引入 Knife4j + Swagger3 自动生成在线接口文档，实现前后端开发规范化。',
+    color: '#f56c6c' // 红色系
+  }
 ])
 </script>
 
@@ -37,7 +64,6 @@ const highlights = ref([
     </el-card>
 
     <div class="intro-section section-gap">
-      
       <div class="intro-left-wrapper">
         <el-card class="intro-card hover-effect" shadow="hover">
           <template #header>
@@ -87,18 +113,70 @@ const highlights = ref([
       <template #header>
         <div class="card-header">
           <el-icon><Trophy /></el-icon>
-          <span>开发环境与全栈技术</span>
+          <span>全栈技术架构</span>
         </div>
       </template>
+      
       <el-descriptions border :column="4" direction="vertical" class="tech-descriptions">
-        <el-descriptions-item label="前端框架"><el-tag>Vue 3</el-tag></el-descriptions-item>
-        <el-descriptions-item label="UI 组件库">Element Plus</el-descriptions-item>
-        <el-descriptions-item label="后端核心"><el-tag type="success">Spring Boot 3</el-tag></el-descriptions-item>
-        <el-descriptions-item label="数据库">MySQL 8.0</el-descriptions-item>
-        <el-descriptions-item label="持久层">MyBatis + PageHelper</el-descriptions-item>
-        <el-descriptions-item label="缓存中间件"><el-tag type="danger" effect="dark">Redis</el-tag></el-descriptions-item>
-        <el-descriptions-item label="对象存储">阿里云 OSS</el-descriptions-item>
-        <el-descriptions-item label="接口文档">Knife4j</el-descriptions-item>
+        
+        <el-descriptions-item>
+          <template #label>
+            <div class="tech-label"><el-icon><Monitor /></el-icon> 前端框架</div>
+          </template>
+          <el-tag effect="plain" type="success" size="large">Vue 3.x</el-tag>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="tech-label"><el-icon><Files /></el-icon> UI 组件库</div>
+          </template>
+          <el-tag effect="plain" type="" size="large">Element Plus</el-tag>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="tech-label"><el-icon><Connection /></el-icon> 后端核心</div>
+          </template>
+          <el-tag effect="dark" type="success" size="large">Spring Boot 3</el-tag>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="tech-label"><el-icon><DataLine /></el-icon> 数据库</div>
+          </template>
+          <div class="tech-group">
+            <el-tag effect="plain" type="info">MySQL 8.0</el-tag>
+            <el-tag effect="plain" type="info" class="ml-1">MyBatis-Plus</el-tag>
+          </div>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="tech-label"><el-icon><Odometer /></el-icon> 缓存中间件</div>
+          </template>
+          <el-tag effect="light" type="danger">Redis 7.x</el-tag>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="tech-label"><el-icon><Cloudy /></el-icon> 对象存储</div>
+          </template>
+          <el-tag effect="light" type="warning">Aliyun OSS</el-tag>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="tech-label"><el-icon><Document /></el-icon> 接口文档</div>
+          </template>
+          <el-tag effect="light" color="#f4f4f5" style="color: #909399">Knife4j</el-tag>
+        </el-descriptions-item>
+        
+        <el-descriptions-item>
+          <template #label>
+            <div class="tech-label"><el-icon><Lock /></el-icon> 安全框架</div>
+          </template>
+           <el-tag effect="light" type="success">JWT + Interceptor</el-tag>
+        </el-descriptions-item>
       </el-descriptions>
     </el-card>
 
@@ -110,9 +188,11 @@ const highlights = ref([
         </div>
       </template>
       <el-row :gutter="20">
-        <el-col :span="6" v-for="(item, index) in highlights" :key="index">
-          <div class="highlight-item">
-            <el-icon class="highlight-icon" :size="30" color="#1a5e38"><Cpu /></el-icon>
+        <el-col :span="6" :xs="24" :sm="12" :md="6" v-for="(item, index) in highlights" :key="index" class="mb-col">
+          <div class="highlight-item" :style="{ '--hover-color': item.color }">
+            <div class="icon-box" :style="{ color: item.color, backgroundColor: item.color + '15' }">
+              <el-icon :size="28"><component :is="item.icon" /></el-icon>
+            </div>
             <h4>{{ item.title }}</h4>
             <p>{{ item.desc }}</p>
           </div>
@@ -124,75 +204,44 @@ const highlights = ref([
 </template>
 
 <style scoped>
+/* 全局容器与基础设置 */
 .school-container {
   padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 30px; /* 全局板块间距，防止重叠 */
+  gap: 30px;
+}
+
+/* 响应式辅助类 */
+.ml-1 { margin-left: 5px; }
+@media (max-width: 768px) {
+  .mb-col { margin-bottom: 20px; }
 }
 
 /* =========================================
-   核心修复：左右等高对齐布局
+   Intro Section (原有布局逻辑保持不变)
    ========================================= */
 .intro-section {
   display: flex;
   gap: 20px;
-  align-items: stretch; /* 关键：强制子元素高度拉伸一致 */
+  align-items: stretch;
 }
+.intro-left-wrapper { flex: 1; display: flex; flex-direction: column; }
+.intro-right-wrapper { flex: 2; display: flex; flex-direction: column; }
+.intro-card, .carousel-card { flex: 1; display: flex; flex-direction: column; }
 
-/* 包装器 */
-.intro-left-wrapper {
-  flex: 1; /* 左侧占 1 份宽度 */
-  display: flex; /* 让内部卡片也能通过 flex 撑开 */
-  flex-direction: column;
-}
-
-.intro-right-wrapper {
-  flex: 2; /* 右侧占 2 份宽度 */
-  display: flex;
-  flex-direction: column;
-}
-
-/* 卡片样式重置 */
-.intro-card, .carousel-card {
-  flex: 1; /* 关键：卡片自身撑满包装器的高度 */
-  display: flex;
-  flex-direction: column;
-}
-
-/* 穿透修改 el-card 内部 body 样式，让内容区也能撑开 */
 :deep(.el-card__body) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
+  flex: 1; display: flex; flex-direction: column; padding: 20px;
 }
-
-/* 简介内容区布局 */
-.intro-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* 上下分散对齐 */
-}
-
-.intro-text {
-  color: #444;
-  line-height: 1.8;
-  font-size: 15px;
-  text-indent: 2em;
-}
-
-.intro-footer {
-  margin-top: 20px;
-  text-align: center;
-}
+.intro-content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.intro-text { color: #444; line-height: 1.8; font-size: 15px; text-indent: 2em; }
+.intro-footer { margin-top: 20px; text-align: center; }
 
 /* =========================================
-   其他美化样式
+   Hero Card Style
    ========================================= */
 .hero-card {
-  background: linear-gradient(135deg, #f0f9eb 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #f0f9eb 0%, #ffffff 80%, #e1f3d8 100%);
   border: none;
   border-left: 6px solid #1a5e38;
 }
@@ -203,17 +252,121 @@ const highlights = ref([
   padding: 15px 0;
 }
 .school-logo { width: 90px; height: 90px; object-fit: contain; margin-right: 30px; }
-.project-title { font-size: 26px; color: #1a5e38; margin: 0 0 10px 0; font-weight: 800; font-family: "KaiTi", serif; }
+.project-title { font-size: 26px; color: #1a5e38; margin: 0 0 10px 0; font-weight: 800; font-family: "KaiTi", serif; letter-spacing: 1px;}
 .school-name { font-size: 16px; color: #555; margin: 0 0 10px 0; font-weight: 500; }
 
+/* =========================================
+   Tech Stack Style (美化 Descriptions)
+   ========================================= */
+.tech-descriptions {
+  /* 给descriptions添加一点阴影效果 */
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+}
+
+:deep(.el-descriptions__label) {
+  background-color: #fafbfc !important;
+  color: #606266;
+  font-weight: 600;
+  width: 120px; /* 固定标签宽度 */
+  vertical-align: middle;
+}
+:deep(.el-descriptions__content) {
+  vertical-align: middle;
+  background-color: #fff;
+}
+
+.tech-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.tech-group {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* =========================================
+   Highlights Style (卡片悬浮特效)
+   ========================================= */
+.highlight-item {
+  background-color: #fff;
+  padding: 25px 20px;
+  border-radius: 12px;
+  border: 1px solid #eef2ed;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 顶部彩色线条装饰 */
+.highlight-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--hover-color);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+  transform-origin: left;
+}
+
+.highlight-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  border-color: transparent;
+}
+
+.highlight-item:hover::before {
+  transform: scaleX(1);
+}
+
+.icon-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  transition: transform 0.3s ease;
+}
+
+.highlight-item:hover .icon-box {
+  transform: rotate(15deg) scale(1.1);
+}
+
+.highlight-item h4 {
+  margin: 10px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #303133;
+}
+
+.highlight-item p {
+  font-size: 13px;
+  color: #606266;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* =========================================
+   Common Card Style
+   ========================================= */
 .hover-effect {
   border-left: 5px solid transparent;
   transition: all 0.3s ease;
 }
 .hover-effect:hover {
   border-left: 5px solid #1a5e38;
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
 }
 
 .card-header {
@@ -222,46 +375,24 @@ const highlights = ref([
   gap: 8px;
   font-weight: bold;
   color: #1a5e38;
-  font-size: 16px;
+  font-size: 17px;
 }
 
+/* Carousel */
 .carousel-img { width: 100%; height: 100%; object-fit: cover; }
 .carousel-item-wrapper { position: relative; width: 100%; height: 100%; }
 .carousel-desc { 
   position: absolute; bottom: 0; left: 0; width: 100%; 
-  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); 
-  color: white; padding: 12px 20px; font-size: 16px; font-weight: bold;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); 
+  color: white; padding: 15px 20px; font-size: 16px; font-weight: bold;
+  letter-spacing: 1px;
 }
 
-:deep(.el-descriptions__label) {
-  font-weight: bold;
-  background-color: #f9fbf8;
-  color: #1a5e38;
-}
-
-.highlight-item {
-  background-color: #fcfdfc;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #eef2ed;
-  height: 100%;
-  transition: all 0.3s;
-}
-.highlight-item:hover {
-  transform: translateY(-5px);
-  border-color: #1a5e38;
-  background-color: #fff;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-}
-.highlight-item h4 { margin: 15px 0 10px 0; color: #333; font-size: 16px; font-weight: bold; }
-.highlight-item p { font-size: 13px; color: #666; line-height: 1.6; margin: 0; text-align: justify; }
-.highlight-icon {
-  background-color: #eaf5e6; padding: 10px; border-radius: 50%;
-  width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
-}
-
-/* 响应式 */
+/* Mobile Responsive */
 @media (max-width: 900px) {
   .intro-section { flex-direction: column; }
+  .intro-left-wrapper, .intro-right-wrapper { width: 100%; flex: auto; }
+  .project-title { font-size: 20px; }
+  .school-logo { width: 60px; height: 60px; margin-right: 15px;}
 }
 </style>
