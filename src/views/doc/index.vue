@@ -37,7 +37,7 @@ import 'highlight.js/styles/github-dark-dimmed.css' // 引入代码高亮样式
 const markdownContent = `
 # 衢州地区信息管理系统 (Hometown Management System)
 
-> **版本**: v1.0.0 
+> **版本**: v1.0.3
 > **开发者**: 毛靖晨 (23H034160336)  
 > **状态**: 🚀 已完成 (Stable)
 

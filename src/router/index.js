@@ -14,6 +14,7 @@ import ReportView from '@/views/report/index.vue'
 import LogView from '@/views/log/index.vue'
 import DevLogView from '@/views/devlog/index.vue'
 import DocView from '@/views/doc/index.vue'
+import MonitorView from '@/views/monitor/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -95,6 +96,12 @@ const router = createRouter({
           name: 'doc',
           component: DocView,
           meta: { title: '项目文档' }
+        },
+        {
+         path: '/monitor',
+         name: 'monitor',
+         component: MonitorView,
+         meta: { title: '服务监控' }
         }
       ]
     }

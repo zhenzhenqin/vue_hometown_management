@@ -158,6 +158,11 @@ const submitPassword = () => {
               <el-menu-item index="/report/dashboard"><el-icon><Odometer /></el-icon>数据概览</el-menu-item>
             </el-sub-menu>
 
+            <el-menu-item index="/monitor">
+              <el-icon><Odometer /></el-icon>
+              <span>服务监控</span>
+            </el-menu-item>
+
             <el-menu-item index="/doc">
               <el-icon><Reading /></el-icon> <span>项目文档</span>
             </el-menu-item>
