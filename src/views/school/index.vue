@@ -1,398 +1,353 @@
 <script setup>
 import { ref } from 'vue'
 import { 
-  Link, Picture, Trophy, School, Star, 
-  // 新增技术栈相关图标
+  Link, Trophy, School, Star, 
   Monitor, DataLine, Files, Connection, Odometer,
-  // 新增亮点相关图标
-  Lightning, Cloudy, Lock, Document
+  Lightning, Cloudy, Lock, Document,
+  Location, Reading, Medal, Timer, ArrowDown, ArrowUp
 } from '@element-plus/icons-vue'
 
-// 本地图片路径 (保持不变)
-const carouselImages = ref([
-  { url: '/image/yifu.png', desc: '逸夫图书馆' },
-  { url: '/image/qiming.jpg', desc: '启明广场' },
-  { url: '/image/riyuehu.jpg', desc: '日月湖' },
+// 1. 手风琴画廊数据 (校园风光)
+const sceneryList = ref([
+  { id: 1, url: '/image/yifu.png', title: '逸夫图书馆', desc: '知识殿堂 · 思想高地' },
+  { id: 2, url: '/image/qiming.jpg', title: '启明广场', desc: '晨读圣地 · 活力源泉' },
+  { id: 3, url: '/image/riyuehu.jpg', title: '日月湖', desc: '湖光潋滟 · 岁月静好' },
+  { id: 4, url: '/image/logo.png', title: '校徽', desc: '精思国计 · 细量民生', isLogo: true } // 增加一张Logo凑数，或者换成qu.svg
 ])
 
-// 升级亮点数据，加入对应的图标组件
-const highlights = ref([
-  { 
-    icon: Lightning, 
-    title: '高性能缓存', 
-    desc: '集成 Redis 缓存热点数据，有效降低 MySQL 数据库 I/O 压力，提升响应速度。',
-    color: '#e6a23c' // 橙色系
-  },
-  { 
-    icon: Cloudy, 
-    title: '云端对象存储', 
-    desc: '接入阿里云 OSS 对象存储服务，实现海量图片资源的高效上传与CDN分发。',
-    color: '#409eff' // 蓝色系
-  },
-  { 
-    icon: Lock, 
-    title: 'JWT 安全认证', 
-    desc: '采用 JWT 实现无状态单点登录，结合自定义拦截器实现细粒度权限控制。',
-    color: '#67c23a' // 绿色系
-  },
-  { 
-    icon: Document, 
-    title: '接口规范化', 
-    desc: '引入 Knife4j + Swagger3 自动生成在线接口文档，实现前后端开发规范化。',
-    color: '#f56c6c' // 红色系
-  }
+// 2. 核心数据 (带颜色)
+const schoolStats = ref([
+  { value: 'Top 1%', label: 'ESI全球学科排名', icon: Trophy, color: '#f56c6c' },
+  { value: '15+', label: '一级学科硕士点', icon: Star, color: '#e6a23c' },
+  { value: '4', label: '顶尖优势学科', icon: Medal, color: '#409eff' },
 ])
+
+// 3. 亮点数据
+const highlights = ref([
+  { icon: Lightning, title: 'Redis 极速缓存', desc: '读写分离，性能飙升 50%', color: '#e6a23c' },
+  { icon: Cloudy, title: 'OSS 云端存储', desc: '海量资源，CDN 全球分发', color: '#409eff' },
+  { icon: Lock, title: 'JWT 安全卫士', desc: '无状态令牌，精准权限控制', color: '#67c23a' },
+  { icon: Document, title: 'Swagger 文档', desc: '接口可视，开发协作无忧', color: '#f56c6c' }
+])
+
+// 4. 时光机控制
+const showHistory = ref(false)
+const historyEvents = [
+  { year: '1978', title: '建校伊始', desc: '学校前身杭州计量学校成立，开启计量教育新篇章。' },
+  { year: '1985', title: '升格本科', desc: '更名为中国计量学院，开始本科层次办学。' },
+  { year: '2016', title: '更名大学', desc: '正式更名为中国计量大学，迈向高水平大学建设新征程。' },
+  { year: '2021', title: '省部共建', desc: '浙江省人民政府与国家市场监管总局共建。' },
+  { year: '2025', title: '未来可期', desc: '全栈信息管理系统上线，数字化建设迈上新台阶！' }
+]
 </script>
 
 <template>
   <div class="school-container">
     
-    <el-card class="hero-card section-gap" shadow="hover">
-      <div class="hero-content">
-        <div class="logo-wrapper">
-          <img src="/image/logo.png" alt="CJLU Logo" class="school-logo" />
-        </div>
-        <div class="text-wrapper">
-          <h1 class="project-title">基于Java的Web开发期末大作业</h1>
-          <p class="school-name">中国计量大学 · China Jiliang University</p>
-          <div class="tags-group">
-            <el-tag type="success" effect="dark" round>2025-2026学年 第一学期</el-tag>
-            <el-tag type="warning" effect="plain" round style="margin-left: 10px">SpringBoot 3 + Vue 3</el-tag>
+    <div class="hero-wrapper">
+      <el-card class="hero-card" shadow="never">
+        <div class="hero-inner">
+          <div class="logo-box">
+            <img src="/image/logo.png" alt="CJLU" class="school-logo" />
+          </div>
+          <div class="text-box">
+            <div class="badges">
+              <span class="badge-pill green">2025-2026 学年</span>
+              <span class="badge-pill gray">Web 期末大作业</span>
+            </div>
+            <h1 class="main-title">衢州地区信息管理系统</h1>
+            <p class="sub-title">China Jiliang University · 中国计量大学</p>
           </div>
         </div>
-      </div>
-    </el-card>
+        <div class="hero-decoration"></div>
+      </el-card>
+    </div>
 
-    <div class="intro-section section-gap">
-      <div class="intro-left-wrapper">
-        <el-card class="intro-card hover-effect" shadow="hover">
-          <template #header>
-            <div class="card-header">
-              <el-icon><School /></el-icon>
-              <span>学校概况</span>
-            </div>
-          </template>
+    <div class="intro-section">
+      <div class="intro-left">
+        <el-card class="glass-card" shadow="hover">
+          <div class="motto-box">
+            <el-icon class="quote-left"><Reading /></el-icon>
+            <span class="motto-text">精思国计 · 细量民生</span>
+          </div>
           
-          <div class="intro-content">
-            <div class="intro-text">
-              <p>中国计量大学是一所以计量、标准、质量、市场监管和检验检疫为办学特色的本科院校。</p>
-              <p>学校坐落于风景秀丽的浙江省杭州市，秉承“精思国计、细量民生”的校训。</p>
-              <p>学校现有硕士学位授权一级学科15个、硕士专业学位授权点10个。工程学、化学、材料科学、环境/生态学等4个学科进入ESI全球排名前1%。</p>
+          <div class="desc-text">
+            <p>坐落于<span class="highlight-word">杭州</span>，这是一所流淌着精准基因的高等学府。我们用代码丈量世界，用数据感知未来。</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card" v-for="(stat, idx) in schoolStats" :key="idx" :style="{ '--accent': stat.color }">
+              <div class="stat-icon-wrapper">
+                <el-icon><component :is="stat.icon" /></el-icon>
+              </div>
+              <div class="stat-data">
+                <div class="num">{{ stat.value }}</div>
+                <div class="lbl">{{ stat.label }}</div>
+              </div>
             </div>
-            <div class="intro-footer">
-              <el-divider border-style="dashed" />
-              <el-link type="primary" href="https://www.cjlu.edu.cn/" target="_blank" :icon="Link">
-                访问学校官网
-              </el-link>
-            </div>
+          </div>
+
+          <div class="action-row">
+            <el-button type="primary" round plain tag="a" href="https://www.cjlu.edu.cn/" target="_blank">
+              <el-icon class="mr-1"><Link /></el-icon> 访问官网
+            </el-button>
+            <el-button class="history-btn" :type="showHistory ? 'info' : 'warning'" circle @click="showHistory = !showHistory">
+              <el-icon><component :is="showHistory ? ArrowUp : Timer" /></el-icon>
+            </el-button>
+            <span class="history-tip" v-if="!showHistory">👈 点击开启时光机</span>
           </div>
         </el-card>
       </div>
 
-      <div class="intro-right-wrapper">
-        <el-card class="carousel-card hover-effect" shadow="hover">
-          <template #header>
-            <div class="card-header">
-              <el-icon><Picture /></el-icon>
-              <span>校园风光</span>
+      <div class="intro-right">
+        <div class="accordion-container">
+          <div 
+            v-for="item in sceneryList" 
+            :key="item.id" 
+            class="accordion-item"
+            :class="{ 'is-logo': item.isLogo }"
+          >
+            <img :src="item.url" class="accordion-img" />
+            <div class="accordion-content">
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.desc }}</p>
             </div>
-          </template>
-          <el-carousel trigger="click" height="340px" :interval="4000">
-            <el-carousel-item v-for="(item, index) in carouselImages" :key="index">
-              <div class="carousel-item-wrapper">
-                <img :src="item.url" class="carousel-img" />
-                <div class="carousel-desc">{{ item.desc }}</div>
-              </div>
-            </el-carousel-item>
-          </el-carousel>
-        </el-card>
+            <div class="accordion-overlay"></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <el-card class="dev-info-card section-gap hover-effect" shadow="hover">
-      <template #header>
-        <div class="card-header">
-          <el-icon><Trophy /></el-icon>
-          <span>全栈技术架构</span>
-        </div>
-      </template>
-      
-      <el-descriptions border :column="4" direction="vertical" class="tech-descriptions">
-        
-        <el-descriptions-item>
-          <template #label>
-            <div class="tech-label"><el-icon><Monitor /></el-icon> 前端框架</div>
-          </template>
-          <el-tag effect="plain" type="success" size="large">Vue 3.x</el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item>
-          <template #label>
-            <div class="tech-label"><el-icon><Files /></el-icon> UI 组件库</div>
-          </template>
-          <el-tag effect="plain" type="" size="large">Element Plus</el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item>
-          <template #label>
-            <div class="tech-label"><el-icon><Connection /></el-icon> 后端核心</div>
-          </template>
-          <el-tag effect="dark" type="success" size="large">Spring Boot 3</el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item>
-          <template #label>
-            <div class="tech-label"><el-icon><DataLine /></el-icon> 数据库</div>
-          </template>
-          <div class="tech-group">
-            <el-tag effect="plain" type="info">MySQL 8.0</el-tag>
-            <el-tag effect="plain" type="info" class="ml-1">MyBatis-Plus</el-tag>
-          </div>
-        </el-descriptions-item>
-
-        <el-descriptions-item>
-          <template #label>
-            <div class="tech-label"><el-icon><Odometer /></el-icon> 缓存中间件</div>
-          </template>
-          <el-tag effect="light" type="danger">Redis 7.x</el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item>
-          <template #label>
-            <div class="tech-label"><el-icon><Cloudy /></el-icon> 对象存储</div>
-          </template>
-          <el-tag effect="light" type="warning">Aliyun OSS</el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item>
-          <template #label>
-            <div class="tech-label"><el-icon><Document /></el-icon> 接口文档</div>
-          </template>
-          <el-tag effect="light" color="#f4f4f5" style="color: #909399">Knife4j</el-tag>
-        </el-descriptions-item>
-        
-        <el-descriptions-item>
-          <template #label>
-            <div class="tech-label"><el-icon><Lock /></el-icon> 安全框架</div>
-          </template>
-           <el-tag effect="light" type="success">JWT + Interceptor</el-tag>
-        </el-descriptions-item>
-      </el-descriptions>
-    </el-card>
-
-    <el-card class="highlight-card hover-effect" shadow="hover">
-      <template #header>
-        <div class="card-header">
-          <el-icon><Star /></el-icon>
-          <span>项目核心亮点</span>
-        </div>
-      </template>
-      <el-row :gutter="20">
-        <el-col :span="6" :xs="24" :sm="12" :md="6" v-for="(item, index) in highlights" :key="index" class="mb-col">
-          <div class="highlight-item" :style="{ '--hover-color': item.color }">
-            <div class="icon-box" :style="{ color: item.color, backgroundColor: item.color + '15' }">
-              <el-icon :size="28"><component :is="item.icon" /></el-icon>
+    <el-collapse-transition>
+      <div v-show="showHistory" class="history-section">
+        <el-card class="history-card" shadow="never">
+          <template #header>
+            <div class="card-header-center">
+              <el-icon><Timer /></el-icon> <span>校史里程碑 · Time Machine</span>
             </div>
-            <h4>{{ item.title }}</h4>
-            <p>{{ item.desc }}</p>
+          </template>
+          <div class="timeline-box">
+            <div class="timeline-item" v-for="(event, i) in historyEvents" :key="i">
+              <div class="year-bubble">{{ event.year }}</div>
+              <div class="event-content">
+                <h4>{{ event.title }}</h4>
+                <p>{{ event.desc }}</p>
+              </div>
+            </div>
+            <div class="timeline-line"></div>
           </div>
-        </el-col>
-      </el-row>
-    </el-card>
+        </el-card>
+      </div>
+    </el-collapse-transition>
+
+    <div class="bottom-grid">
+      <el-card class="tech-card hover-lift" shadow="hover">
+        <template #header>
+          <div class="card-header"><el-icon><Trophy /></el-icon> <span>全栈架构</span></div>
+        </template>
+        <div class="tech-tags">
+          <div class="tag-group">
+            <span class="group-label">Front</span>
+            <el-tag type="success">Vue 3</el-tag>
+            <el-tag type="info">Vite</el-tag>
+            <el-tag>Element Plus</el-tag>
+          </div>
+          <div class="tag-group">
+            <span class="group-label">Back</span>
+            <el-tag type="success" effect="dark">Spring Boot 3</el-tag>
+            <el-tag type="warning">MyBatis-Plus</el-tag>
+          </div>
+          <div class="tag-group">
+            <span class="group-label">Data</span>
+            <el-tag type="danger">Redis</el-tag>
+            <el-tag type="info">MySQL</el-tag>
+            <el-tag color="#fdf6ec" style="color:#e6a23c">Aliyun OSS</el-tag>
+          </div>
+        </div>
+      </el-card>
+
+      <el-card class="highlight-card hover-lift" shadow="hover">
+        <template #header>
+          <div class="card-header"><el-icon><Star /></el-icon> <span>核心亮点</span></div>
+        </template>
+        <div class="highlight-list">
+          <div class="hl-item" v-for="(hl, i) in highlights" :key="i">
+            <div class="hl-icon" :style="{ background: hl.color }">
+              <el-icon><component :is="hl.icon" /></el-icon>
+            </div>
+            <div class="hl-info">
+              <div class="hl-title">{{ hl.title }}</div>
+              <div class="hl-desc">{{ hl.desc }}</div>
+            </div>
+          </div>
+        </div>
+      </el-card>
+    </div>
 
   </div>
 </template>
 
 <style scoped>
-/* 全局容器与基础设置 */
+/* 全局字体与容器 */
 .school-container {
   padding: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', sans-serif;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 24px;
 }
 
-/* 响应式辅助类 */
-.ml-1 { margin-left: 5px; }
-@media (max-width: 768px) {
-  .mb-col { margin-bottom: 20px; }
-}
-
-/* =========================================
-   Intro Section (原有布局逻辑保持不变)
-   ========================================= */
-.intro-section {
-  display: flex;
-  gap: 20px;
-  align-items: stretch;
-}
-.intro-left-wrapper { flex: 1; display: flex; flex-direction: column; }
-.intro-right-wrapper { flex: 2; display: flex; flex-direction: column; }
-.intro-card, .carousel-card { flex: 1; display: flex; flex-direction: column; }
-
-:deep(.el-card__body) {
-  flex: 1; display: flex; flex-direction: column; padding: 20px;
-}
-.intro-content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.intro-text { color: #444; line-height: 1.8; font-size: 15px; text-indent: 2em; }
-.intro-footer { margin-top: 20px; text-align: center; }
-
-/* =========================================
-   Hero Card Style
-   ========================================= */
+/* ================= Hero 区域 ================= */
 .hero-card {
-  background: linear-gradient(135deg, #f0f9eb 0%, #ffffff 80%, #e1f3d8 100%);
-  border: none;
-  border-left: 6px solid #1a5e38;
-}
-.hero-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px 0;
-}
-.school-logo { width: 90px; height: 90px; object-fit: contain; margin-right: 30px; }
-.project-title { font-size: 26px; color: #1a5e38; margin: 0 0 10px 0; font-weight: 800; font-family: "KaiTi", serif; letter-spacing: 1px;}
-.school-name { font-size: 16px; color: #555; margin: 0 0 10px 0; font-weight: 500; }
-
-/* =========================================
-   Tech Stack Style (美化 Descriptions)
-   ========================================= */
-.tech-descriptions {
-  /* 给descriptions添加一点阴影效果 */
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-}
-
-:deep(.el-descriptions__label) {
-  background-color: #fafbfc !important;
-  color: #606266;
-  font-weight: 600;
-  width: 120px; /* 固定标签宽度 */
-  vertical-align: middle;
-}
-:deep(.el-descriptions__content) {
-  vertical-align: middle;
-  background-color: #fff;
-}
-
-.tech-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
-.tech-group {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-
-/* =========================================
-   Highlights Style (卡片悬浮特效)
-   ========================================= */
-.highlight-item {
-  background-color: #fff;
-  padding: 25px 20px;
-  border-radius: 12px;
-  border: 1px solid #eef2ed;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: linear-gradient(135deg, #ffffff 0%, #f2fcf5 100%);
+  border: 1px solid #e1f3d8;
+  border-radius: 16px;
   position: relative;
   overflow: hidden;
 }
-
-/* 顶部彩色线条装饰 */
-.highlight-item::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background-color: var(--hover-color);
-  transform: scaleX(0);
-  transition: transform 0.4s ease;
-  transform-origin: left;
-}
-
-.highlight-item:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-  border-color: transparent;
-}
-
-.highlight-item:hover::before {
-  transform: scaleX(1);
-}
-
-.icon-box {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+.hero-inner {
   display: flex;
   align-items: center;
-  justify-content: center;
+  position: relative;
+  z-index: 2;
+  padding: 10px;
+}
+.school-logo { width: 88px; margin-right: 24px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+.text-box .main-title {
+  font-size: 28px; font-weight: 800; color: #1a5e38; margin: 8px 0; letter-spacing: 1px;
+}
+.text-box .sub-title { color: #666; font-size: 16px; margin: 0; }
+.badges { display: flex; gap: 8px; font-size: 12px; font-weight: bold; }
+.badge-pill { padding: 2px 8px; border-radius: 4px; }
+.badge-pill.green { background: #e1f3d8; color: #1a5e38; }
+.badge-pill.gray { background: #f4f4f5; color: #909399; }
+.hero-decoration {
+  position: absolute; top: -50px; right: -50px; width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(103,194,58,0.15), transparent 70%);
+  border-radius: 50%; z-index: 1;
+}
+
+/* ================= 介绍区域 (非对称) ================= */
+.intro-section { display: flex; gap: 24px; height: 400px; /* 固定高度给手风琴发挥 */ }
+.intro-left { flex: 4; display: flex; flex-direction: column; }
+.intro-right { flex: 6; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+
+/* 左侧玻璃卡片 */
+.glass-card {
+  flex: 1; border-radius: 16px; border: none;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.motto-box {
+  display: flex; align-items: center; gap: 8px;
+  font-family: "KaiTi", serif; font-size: 24px; font-weight: bold; color: #1a5e38;
   margin-bottom: 15px;
-  transition: transform 0.3s ease;
 }
+.desc-text { color: #555; line-height: 1.6; margin-bottom: 20px; font-size: 14px; }
+.highlight-word { background: #e1f3d8; padding: 0 4px; border-radius: 2px; color: #1a5e38; font-weight: bold; }
 
-.highlight-item:hover .icon-box {
-  transform: rotate(15deg) scale(1.1);
+/* 3D Stats Grid */
+.stats-grid { display: flex; gap: 12px; margin-bottom: 20px; }
+.stat-card {
+  flex: 1; background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 12px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: default;
 }
+.stat-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  border-color: var(--accent);
+}
+.stat-icon-wrapper { color: var(--accent); font-size: 24px; margin-bottom: 5px; }
+.stat-data .num { font-size: 18px; font-weight: 800; color: #303133; }
+.stat-data .lbl { font-size: 11px; color: #909399; }
 
-.highlight-item h4 {
-  margin: 10px 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #303133;
-}
+/* 底部按钮行 */
+.action-row { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+.history-tip { font-size: 12px; color: #e6a23c; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
-.highlight-item p {
-  font-size: 13px;
-  color: #606266;
-  line-height: 1.6;
-  margin: 0;
+/* ================= 手风琴画廊 (核心创新) ================= */
+.accordion-container {
+  display: flex; width: 100%; height: 100%; overflow: hidden;
 }
+.accordion-item {
+  position: relative; flex: 1; height: 100%; cursor: pointer;
+  transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+.accordion-img {
+  width: 100%; height: 100%; object-fit: cover;
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  transition: transform 0.6s; filter: brightness(0.9);
+}
+.accordion-item:hover { flex: 4; /* 悬浮时展开占4份 */ }
+.accordion-item:hover .accordion-img { filter: brightness(1.05); transform: translate(-50%, -50%) scale(1.05); }
 
-/* =========================================
-   Common Card Style
-   ========================================= */
-.hover-effect {
-  border-left: 5px solid transparent;
-  transition: all 0.3s ease;
+/* 文字遮罩 */
+.accordion-overlay {
+  position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent 40%);
+  opacity: 0; transition: opacity 0.4s;
 }
-.hover-effect:hover {
-  border-left: 5px solid #1a5e38;
+.accordion-content {
+  position: absolute; bottom: 20px; left: 20px; color: #fff; z-index: 10;
+  opacity: 0; transform: translateY(20px); transition: all 0.4s 0.1s; width: 80%;
 }
+.accordion-content h3 { font-size: 20px; margin: 0 0 5px 0; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+.accordion-content p { font-size: 13px; margin: 0; opacity: 0.9; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
 
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: bold;
-  color: #1a5e38;
-  font-size: 17px;
-}
+/* 展开时显示文字 */
+.accordion-item:hover .accordion-content { opacity: 1; transform: translateY(0); }
+.accordion-item:hover .accordion-overlay { opacity: 1; }
+/* Logo特殊处理 */
+.is-logo .accordion-img { object-fit: contain; padding: 40px; background: #f9f9f9; }
 
-/* Carousel */
-.carousel-img { width: 100%; height: 100%; object-fit: cover; }
-.carousel-item-wrapper { position: relative; width: 100%; height: 100%; }
-.carousel-desc { 
-  position: absolute; bottom: 0; left: 0; width: 100%; 
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); 
-  color: white; padding: 15px 20px; font-size: 16px; font-weight: bold;
-  letter-spacing: 1px;
+/* ================= 时光机 (Timeline) ================= */
+.history-section { margin-top: -10px; }
+.history-card { border-radius: 16px; border: 2px dashed #e6a23c; background: #fffdf5; }
+.card-header-center { display: flex; justify-content: center; align-items: center; font-weight: bold; color: #e6a23c; gap: 8px; }
+.timeline-box {
+  display: flex; justify-content: space-between; align-items: flex-start; position: relative; padding: 20px 10px;
 }
+.timeline-line {
+  position: absolute; top: 35px; left: 20px; right: 20px; height: 2px; background: #e6a23c; z-index: 0; opacity: 0.3;
+}
+.timeline-item {
+  z-index: 1; text-align: center; width: 18%; position: relative;
+}
+.year-bubble {
+  display: inline-block; background: #e6a23c; color: #fff; padding: 4px 12px; border-radius: 12px; font-weight: bold; margin-bottom: 12px;
+  box-shadow: 0 4px 10px rgba(230, 162, 60, 0.4);
+}
+.event-content h4 { font-size: 14px; font-weight: bold; color: #303133; margin: 0 0 4px 0; }
+.event-content p { font-size: 12px; color: #909399; line-height: 1.4; }
 
-/* Mobile Responsive */
+/* ================= 底部网格 (Tech & Highlights) ================= */
+.bottom-grid { display: flex; gap: 24px; }
+.tech-card, .highlight-card { flex: 1; border-radius: 16px; }
+.hover-lift { transition: transform 0.3s; }
+.hover-lift:hover { transform: translateY(-3px); }
+
+.tech-tags { display: flex; flex-direction: column; gap: 15px; }
+.tag-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.group-label { width: 40px; font-size: 12px; font-weight: bold; color: #909399; text-transform: uppercase; }
+
+.highlight-list { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.hl-item { display: flex; align-items: flex-start; gap: 10px; }
+.hl-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.hl-title { font-size: 14px; font-weight: bold; color: #303133; }
+.hl-desc { font-size: 12px; color: #999; line-height: 1.3; margin-top: 2px; }
+
+/* 响应式 */
 @media (max-width: 900px) {
-  .intro-section { flex-direction: column; }
-  .intro-left-wrapper, .intro-right-wrapper { width: 100%; flex: auto; }
-  .project-title { font-size: 20px; }
-  .school-logo { width: 60px; height: 60px; margin-right: 15px;}
+  .intro-section { flex-direction: column; height: auto; }
+  .intro-right { height: 300px; }
+  .bottom-grid { flex-direction: column; }
+  .timeline-box { flex-direction: column; gap: 20px; }
+  .timeline-line { display: none; }
+  .timeline-item { width: 100%; text-align: left; display: flex; gap: 15px; }
 }
 </style>
