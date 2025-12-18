@@ -157,6 +157,10 @@ const submitPassword = () => {
               <template #title><el-icon><DataLine /></el-icon><span>数据统计</span></template>
               <el-menu-item index="/report/dashboard"><el-icon><Odometer /></el-icon>数据概览</el-menu-item>
             </el-sub-menu>
+
+            <el-menu-item index="/doc">
+              <el-icon><Reading /></el-icon> <span>项目文档</span>
+            </el-menu-item>
           </el-menu>
         </el-aside>
 

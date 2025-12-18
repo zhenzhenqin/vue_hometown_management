@@ -13,6 +13,7 @@ import UserView from '@/views/user/index.vue'
 import ReportView from '@/views/report/index.vue'
 import LogView from '@/views/log/index.vue'
 import DevLogView from '@/views/devlog/index.vue'
+import DocView from '@/views/doc/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -88,6 +89,12 @@ const router = createRouter({
           path: '/:pathMatch(.*)*', 
           name: 'NotFound', 
           redirect: '/login' 
+        },
+        {
+          path: '/doc',
+          name: 'doc',
+          component: DocView,
+          meta: { title: '项目文档' }
         }
       ]
     }
