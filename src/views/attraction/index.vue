@@ -72,6 +72,8 @@ const attr = ref({
   id: null,
   name: '',
   location: '',
+  longitude: null, 
+  latitude: null,  
   score: null,
   description: '',
   image: ''
@@ -85,6 +87,8 @@ const add = () => {
     name: '',
     score: null,
     location: '',
+    longitude: null, 
+    latitude: null,  
     description: '',
     image: ''
   }
@@ -155,7 +159,7 @@ const rules = ref({
     { required: true, message: '请填写景区描述', trigger: 'blur' },  // 修正为景区
     { max: 500, message: '最多输入500个字符', trigger: 'change' }
   ],
-  score: [
+  /* score: [
     { required: true, message: '请输入评分', trigger: 'blur' },
     {
       validator: (rule, value, callback) => {
@@ -171,6 +175,36 @@ const rules = ref({
         }
       },
       trigger: 'blur'
+    }
+  ], */
+  longitude: [
+    { required: true, message: '请输入经度', trigger: 'blur' },
+    { 
+      validator: (rule, value, callback) => {
+        if (value === '' || value === null) {
+          callback(new Error('请输入经度'));
+        } else if (isNaN(Number(value))) {
+          callback(new Error('经度必须为数字'));
+        } else {
+          callback();
+        }
+      }, 
+      trigger: 'blur' 
+    }
+  ],
+  latitude: [
+    { required: true, message: '请输入纬度', trigger: 'blur' },
+    { 
+      validator: (rule, value, callback) => {
+        if (value === '' || value === null) {
+          callback(new Error('请输入纬度'));
+        } else if (isNaN(Number(value))) {
+          callback(new Error('纬度必须为数字'));
+        } else {
+          callback();
+        }
+      }, 
+      trigger: 'blur' 
     }
   ]
 })
@@ -310,10 +344,10 @@ const batchDeleteAtt = async () => {  // 修正方法名
       <el-table :data="attractionList" border style="width: 100%" @selection-change="handleSelectionChange"
         size="medium" :header-cell-style="tableHeaderStyle" :row-class-name="tableRowClassName"
         :cell-style="tableCellStyle">
-        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="name" label="景区名称" width="160" align="center" />
-        <el-table-column prop="location" label="位置" width="200" align="center" />
+        <el-table-column prop="name" label="景区名称" width="120" align="center" />
+        <el-table-column prop="location" label="位置" width="190" align="center" />
 
         <!-- 图片展示 -->
         <el-table-column prop="image" label="图片" width="120" align="center">
@@ -325,13 +359,16 @@ const batchDeleteAtt = async () => {  // 修正方法名
           </template>
         </el-table-column>
 
-        <el-table-column prop="score" label="评分" width="70" align="center" />
-        <el-table-column prop="liked" label="点赞数" width="70" align="center" />
-        <el-table-column prop="disliked" label="差评数" width="70" align="center" />
+        <el-table-column prop="score" label="评分" width="60" align="center" />
+        <el-table-column prop="liked" label="点赞数" width="60" align="center" />
+        <el-table-column prop="disliked" label="差评数" width="60" align="center" />
+
+        <el-table-column prop="longitude" label="经度" width="100" align="center" />
+        <el-table-column prop="latitude" label="纬度" width="100" align="center" />
 
         <el-table-column prop="description" label="描述" :min-width="350" align="center" show-overflow-tooltip
           tooltip-effect="dark" />
-        <el-table-column prop="createTime" label="创建时间" width="180" align="center" />
+        <!-- <el-table-column prop="createTime" label="创建时间" width="180" align="center" /> -->
         <el-table-column prop="updateTime" label="最后操作时间" width="180" align="center" />
 
         <el-table-column label="操作" align="center" width="180">
@@ -366,6 +403,19 @@ const batchDeleteAtt = async () => {  // 修正方法名
         <el-form-item label="景区位置" prop="location" class="form-item">
           <el-input v-model="attr.location" placeholder="请输入景区位置" class="form-input" />
         </el-form-item>
+
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="经度" prop="longitude" class="form-item">
+              <el-input v-model="attr.longitude" placeholder="请输入经度 (如: 118.87)" class="form-input" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="纬度" prop="latitude" class="form-item">
+              <el-input v-model="attr.latitude" placeholder="请输入纬度 (如: 28.94)" class="form-input" />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
         <!-- <el-form-item label="评分" prop="score" class="form-item">
           <el-input v-model="attr.score" type="number" step="0.1" min="0" max="5" placeholder="0-10分"
