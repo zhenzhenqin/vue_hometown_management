@@ -100,8 +100,20 @@ const add = () => {
 
 // 图片上传成功回调
 const handleAvatarSuccess = (response) => {
-  attr.value.image = response.data;
+  // 根据后端的 Result 结构调整
+  // 如果后端返回 Result.success(url)，则 response.code === 1 且 response.data 是 url
+  if (response.code === 1) {
+    attr.value.image = response.data;
+    ElMessage.success('图片上传成功');
+  } else {
+    ElMessage.error(response.msg || '图片上传失败');
+  }
 }
+
+/* const handleAvatarSuccess = (response) => {
+  attr.value.image = response.data;
+} */
+
 
 // 图片上传验证
 const beforeAvatarUpload = (rawFile) => {
