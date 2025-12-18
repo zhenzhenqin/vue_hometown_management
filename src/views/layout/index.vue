@@ -145,6 +145,11 @@ const submitPassword = () => {
               <el-menu-item index="/attraction"><el-icon><LocationFilled /></el-icon>景点模块</el-menu-item>
             </el-sub-menu>
 
+            <el-menu-item index="/map">
+              <el-icon><MapLocation /></el-icon>
+              <span>景区地图</span>
+            </el-menu-item>
+
             <el-sub-menu index="/system">
               <template #title><el-icon><Setting /></el-icon><span>系统管理</span></template>
               <el-menu-item index="/adminList"><el-icon><UserFilled /></el-icon>管理员列表</el-menu-item>
