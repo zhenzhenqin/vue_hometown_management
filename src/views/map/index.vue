@@ -40,42 +40,43 @@ const initMap = () => {
   const centerPoint = new BMapGL.Point(118.87263, 28.941708)
   mapInstance.centerAndZoom(centerPoint, 10) // 10级缩放刚好看到整个衢州
   mapInstance.enableScrollWheelZoom(true) // 开启滚轮缩放
-  
-  // 设置地图样式（可选，使用标准样式）
-  // mapInstance.setMapType(BMAP_NORMAL_MAP) 
 }
 
 // 加载并标记景点
 const loadAndMarkAttractions = async () => {
   loading.value = true
   try {
-    // 调用分页接口获取所有数据
-    // 注意：这里为了获取"全部"数据，pageSize 设为了 1000。
-    // 如果数据量非常大，建议后端提供一个不分页的接口专门用于地图展示。
+    // 调用分页接口获取所有数据，pageSize 设为 1000 以获取全部数据
     const res = await listAllAttractions(null, null, null, 1, 1000)
     
     if (res.code === 1 && res.data && res.data.rows) {
       const list = res.data.rows
       totalAttractions.value = res.data.total // 或者 list.length
 
+      const hasCoords = []
+      const noCoords = []
+
+      // 1. 数据分类
       list.forEach(item => {
-        // 优先使用数据库中的经纬度
         if (item.longitude && item.latitude) {
-          const point = new BMapGL.Point(item.longitude, item.latitude)
-          addMarker(point, item)
+          hasCoords.push(item)
         } else {
-          // 如果没有坐标，尝试用地址解析（兜底方案）
-          // 注意：频繁解析可能会被限流或较慢
-          console.warn(`景点 [${item.name}] 缺少坐标，尝试解析地址...`)
-          const myGeo = new BMapGL.Geocoder()
-          const address = '衢州市 ' + (item.location || item.name)
-          myGeo.getPoint(address, (point) => {
-            if (point) {
-              addMarker(point, item)
-            }
-          }, '衢州市')
+          noCoords.push(item)
         }
       })
+
+      // 2. 有坐标的：直接秒开，不需要请求百度 API
+      hasCoords.forEach(item => {
+        const point = new BMapGL.Point(item.longitude, item.latitude)
+        addMarker(point, item)
+      })
+
+      // 3. 无坐标的：排队慢速处理，避免触发并发限制
+      if (noCoords.length > 0) {
+        console.warn(`有 ${noCoords.length} 个景点缺少坐标，正在慢速解析...`)
+        processQueueSlowly(noCoords)
+      }
+
     } else {
       ElMessage.warning(res.msg || '获取景区数据失败')
     }
@@ -84,6 +85,25 @@ const loadAndMarkAttractions = async () => {
     ElMessage.error('网络请求失败')
   } finally {
     loading.value = false
+  }
+}
+
+// ✨ 新增：慢速队列处理函数
+const processQueueSlowly = async (list) => {
+  for (const item of list) {
+    // 尝试解析地址
+    const myGeo = new BMapGL.Geocoder()
+    const address = '衢州市 ' + (item.location || item.name)
+    
+    myGeo.getPoint(address, (point) => {
+      if (point) {
+        addMarker(point, item)
+      }
+    }, '衢州市')
+
+    // 强制等待 300 毫秒再处理下一个
+    // 这样 1 秒钟最多请求 3 次，绝对安全
+    await new Promise(resolve => setTimeout(resolve, 300))
   }
 }
 

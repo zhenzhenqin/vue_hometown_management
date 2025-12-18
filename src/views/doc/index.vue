@@ -31,21 +31,22 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { Reading } from '@element-plus/icons-vue'
 import { marked } from 'marked'
 import hljs from 'highlight.js'
-import 'highlight.js/styles/github-dark-dimmed.css' // 引入代码高亮样式
+import 'highlight.js/styles/github-dark-dimmed.css'
 
 // --- 📝 项目核心文档 (Markdown) ---
+// 注意：下面的代码块符号 ``` 前面都加了反斜杠 \ 转义，这是必须的！
 const markdownContent = `
 # 衢州地区信息管理系统 (Hometown Management System)
 
-> **版本**: v1.0.3
+> **版本**: v1.0.4
 > **开发者**: 毛靖晨 (23H034160336)  
-> **状态**: 🚀 已完成 (Stable)
+> **状态**: 🚀 已上线 (Stable)
 
 ---
 
 ## 1. 项目概述 (Overview)
 
-本项目是一个致力于**弘扬衢州文化、推广地方特色**的全栈信息管理平台。系统集成了**文化遗产展示、特产推广、旅游景点导航**以及**后台数据可视化管理**等功能，旨在通过数字化手段，让更多人了解“南孔圣地·衢州有礼”的独特魅力。
+本项目是一个致力于**弘扬衢州文化、推广地方特色**的全栈信息管理平台。系统集成了**文化遗产展示、特产推广、旅游景点导航**以及**后台数据可视化管理**等功能。
 
 项目采用**前后端分离**架构，分为三个独立子系统：
 1.  **后端服务 (Core Server)**: 基于 Spring Boot 的核心业务逻辑与数据接口。
@@ -62,21 +63,18 @@ const markdownContent = `
 -   **数据库**: MySQL 8.0
 -   **缓存**: Redis (用于会话管理与热点数据缓存)
 -   **安全**: JWT (JSON Web Token) 鉴权, 拦截器机制
+-   **监控**: OSHI (System Hardware Information) 
 -   **工具**: Swagger/Knife4j (接口文档), Lombok, FastJSON
 -   **云服务**: 阿里云 OSS (对象存储)
 
-### 💻 前端管理端 (Admin)
+### 💻 前端 (Frontend)
 -   **框架**: Vue 3 (Composition API)
 -   **构建**: Vite 4.x
 -   **UI 组件库**: Element Plus
 -   **图表**: ECharts 5.x (数据大屏)
+-   **地图**: 百度地图 JavaScript API GL
 -   **路由**: Vue Router 4
 -   **HTTP**: Axios (封装请求拦截器)
-
-### 📱 前端用户端 (User)
--   **框架**: Vue 3
--   **视觉**: Three.js (部分3D效果), CSS3 Animations
--   **布局**: 响应式设计 (适配 PC 与移动端)
 
 ---
 
@@ -94,12 +92,23 @@ graph TD
     
     Server -->|读写| DB[(MySQL 数据库)]
     Server -->|缓存| Cache[(Redis)]
+    Server -->|监控| Hardware[OSHI 硬件监控]
     Server -->|存储图片| OSS[阿里云 OSS]
 \`\`\`
 
 ---
 
 ## 4. 核心功能模块 (Modules)
+
+### 🗺️ 分布地图 (Attraction Map) **[NEW]**
+-   **全域导览**: 集成百度地图 GL，直观展示衢州所有景点的地理分布。
+-   **智能定位**: 支持数据库经纬度直接打点，同时也支持基于地址的自动解析兜底方案。
+-   **沉浸体验**: 3D 倾斜视角 + 飞行跳转动画 (FlyTo)，提供流畅的云游体验。
+
+### 🖥️ 服务监控 (Server Monitor) **[NEW]**
+-   **实时仪表盘**: 实时监控服务器的 CPU 使用率、内存占用率。
+-   **环境信息**: 展示服务器操作系统、IP 地址、Java 版本、项目路径等。
+-   **磁盘检测**: 自动扫描服务器磁盘分区及使用情况。
 
 ### 🏛️ 文化遗产 (Culture)
 -   **非遗展示**: 收录衢州各类非物质文化遗产。
@@ -109,11 +118,6 @@ graph TD
 ### 🍗 特产美食 (Specialties)
 -   **特产名录**: 三头一掌、烤饼等特色美食介绍。
 -   **推荐算法**: (计划中) 基于用户喜好的个性化推荐。
-
-### 🏞️ 景点导航 (Attractions)
--   **景点库**: 烂柯山、孔庙、龙游石窟等核心景点。
--   **地图定位**: 集成地理位置信息。
--   **评分系统**: 用户可对景点进行打分与评论。
 
 ### 📊 数据大屏 (Dashboard)
 -   **实时监控**: 用户访问量、API 调用频率。
@@ -127,38 +131,35 @@ graph TD
 
 ## 5. 核心代码片段 (Code Snippets)
 
-### 🔐 1. JWT 令牌生成 (Java)
+### 📡 1. OSHI 获取系统信息 (Java)
 \`\`\`java
-public static String createJWT(String secretKey, long ttlMillis, Map<String, Object> claims) {
-    // 指定签名算法
-    SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-    // 生成JWT的时间
-    long expMillis = System.currentTimeMillis() + ttlMillis;
-    Date exp = new Date(expMillis);
+public void copyTo() throws Exception {
+    SystemInfo si = new SystemInfo();
+    HardwareAbstractionLayer hal = si.getHardware();
 
-    // 设置jwt的body
-    JwtBuilder builder = Jwts.builder()
-            .setClaims(claims)
-            .signWith(signatureAlgorithm, secretKey.getBytes(StandardCharsets.UTF_8))
-            .setExpiration(exp);
-    return builder.compact();
+    setCpuInfo(hal.getProcessor());
+    setMemInfo(hal.getMemory());
+    setSysInfo();
+    setJvmInfo();
+    setSysFiles(si.getOperatingSystem());
 }
 \`\`\`
 
-### 📡 2. Axios 请求拦截器 (JavaScript)
+### 🗺️ 2. 百度地图智能打点 (JavaScript)
 \`\`\`javascript
-service.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers['token'] = token // 统一携带 Token
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
+const addCreativeMarker = (item) => {
+  // 🟢 优先使用数据库经纬度 (高性能)
+  if (item.longitude && item.latitude) {
+    const point = new BMapGL.Point(item.longitude, item.latitude)
+    createMarkerLogic(point, item)
+  } else {
+    // 🟡 兜底：使用地址解析 (兼容旧数据)
+    const myGeo = new BMapGL.Geocoder()
+    myGeo.getPoint('衢州市 ' + (item.location || item.name), (p) => {
+      if (p) createMarkerLogic(p, item)
+    }, '衢州市')
   }
-)
+}
 \`\`\`
 
 ---
@@ -172,7 +173,7 @@ service.interceptors.request.use(
 -   Redis 5.0+
 
 ### 启动步骤
-1.  **数据库**: 导入 \`init.sql\` 初始化表结构与数据。
+1.  **数据库**: 导入 \`init.sql\` (包含新增的 longitude/latitude 字段)。
 2.  **后端**: 修改 \`application.yml\` 中的 DB/Redis 配置，运行 \`HometownApplication.java\`。
 3.  **前端**: 
     \`\`\`bash
@@ -185,12 +186,21 @@ service.interceptors.request.use(
 
 ## 7. 更新日志 (Changelog)
 
+-   **v1.0.4 (2025-12-19)**:
+    -   ✨ **[Feature]** 新增 **“分布地图”** 模块，支持全屏 3D 地图导览。
+    -   ✨ **[Feature]** 新增 **“服务监控”** 模块，基于 OSHI 实时展示服务器状态。
+    -   🔧 **[Database]** \`attraction\` 表新增 \`longitude\` 和 \`latitude\` 字段。
+    -   💄 **[UI]** 优化了侧边栏布局，修复了地图页面的留白和遮挡问题。
+    -   🔒 **[Security]** 用户端点赞/差评增加登录拦截校验。
+
 -   **v1.0.3 (2025-12-18)**: 
     -   ✨ 新增“系统进化 (DevLog)”模块，支持多仓库提交记录查看。
     -   🐛 修复了景点图片上传不显示的 Bug。
+
 -   **v1.0.2 (2025-12-17)**: 
     -   💄 优化后台 UI，增加赛博朋克风格组件。
     -   📈 完善 ECharts 数据大屏。
+
 -   **v1.0.0 (2025-12-01)**: 
     -   🎉 项目初始化，完成基础 CRUD 功能。
 
@@ -210,7 +220,7 @@ marked.setOptions({
     const language = hljs.getLanguage(lang) ? lang : 'plaintext';
     return hljs.highlight(code, { language }).value;
   },
-  langPrefix: 'hljs language-', // highlight.js css expects a top-level 'hljs' class.
+  langPrefix: 'hljs language-',
   pedantic: false,
   gfm: true,
   breaks: false,
@@ -252,23 +262,21 @@ const scrollTo = (id) => {
   }
 }
 
-// 监听滚动更新目录高亮 (简化版)
 const handleScroll = () => {
-  // 实际项目中可以使用 IntersectionObserver 实现更精准的监听
+  // scroll logic
 }
 </script>
 
 <style scoped>
-/* 容器布局 */
+/* 样式保持不变 */
 .doc-container {
   display: flex;
   height: 100%;
   background-color: #ffffff;
   font-family: 'Segoe UI', sans-serif;
-  overflow: hidden; /* 防止外层滚动 */
+  overflow: hidden; 
 }
 
-/* 左侧目录 */
 .doc-sidebar {
   width: 280px;
   background-color: #f8f9fa;
@@ -313,7 +321,7 @@ const handleScroll = () => {
 
 .toc-list li.active {
   background-color: #e7f5ff;
-  color: #1a5e38; /* 主题色 */
+  color: #1a5e38;
   border-left-color: #1a5e38;
   font-weight: 600;
 }
@@ -324,7 +332,6 @@ const handleScroll = () => {
   color: #868e96;
 }
 
-/* 右侧内容 (Markdown 样式) */
 .doc-content {
   flex: 1;
   padding: 40px 60px;
@@ -333,7 +340,6 @@ const handleScroll = () => {
   background-color: #fff;
 }
 
-/* Markdown 排版样式 (仿 GitHub) */
 :deep(.markdown-body) {
   color: #24292f;
   line-height: 1.6;
@@ -344,7 +350,7 @@ const handleScroll = () => {
   padding-bottom: 0.3em;
   border-bottom: 1px solid #eaecef;
   margin-bottom: 24px;
-  color: #1a5e38; /* 标题用主题色 */
+  color: #1a5e38;
 }
 
 :deep(h2) {
@@ -376,7 +382,7 @@ const handleScroll = () => {
 }
 
 :deep(pre) {
-  background-color: #2d333b; /* 代码块深色背景 */
+  background-color: #2d333b; 
   padding: 16px;
   border-radius: 8px;
   overflow: auto;
@@ -393,7 +399,6 @@ const handleScroll = () => {
   padding: 0;
 }
 
-/* 行内代码 */
 :deep(:not(pre) > code) {
   padding: 0.2em 0.4em;
   margin: 0;
@@ -420,7 +425,6 @@ const handleScroll = () => {
   font-size: 12px;
 }
 
-/* 滚动条美化 */
 .doc-content::-webkit-scrollbar,
 .doc-sidebar::-webkit-scrollbar {
   width: 6px;
