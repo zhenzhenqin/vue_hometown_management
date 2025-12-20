@@ -4,35 +4,73 @@ import {
   Link, Trophy, School, Star, 
   Monitor, DataLine, Files, Connection, Odometer,
   Lightning, Cloudy, Lock, Document,
-  Location, Reading, Medal, Timer, ArrowDown, ArrowUp
+  Location, Reading, Medal, Timer, ArrowDown, ArrowUp,
+  Platform, Coin, Cpu,
+  MapLocation, PieChart, View // 新增图标
 } from '@element-plus/icons-vue'
 
-// 1. 手风琴画廊数据 (校园风光)
-// 💡 提示：确保 public/image/ 下有这些图片，否则会裂图
+// 1. 手风琴画廊数据
 const sceneryList = ref([
   { id: 1, url: '/image/yifu.png', title: '逸夫图书馆', desc: '知识殿堂 · 思想高地' },
   { id: 2, url: '/image/qiming.jpg', title: '启明广场', desc: '晨读圣地 · 活力源泉' },
   { id: 3, url: '/image/riyuehu.jpg', title: '日月湖', desc: '湖光潋滟 · 岁月静好' },
-  // 替换了 Logo，改用一张更有氛围的图，或者保持 Logo 但加个背景样式
-  { id: 4, url: '/image/logo.png', title: '校训石', desc: '精思国计 · 细量民生', isLogo: true } 
+  { id: 4, url: '/image/logo.png', title: '学校logo', desc: '精思国计 · 细量民生', isLogo: true } 
 ])
 
-// 2. 核心数据 (配色微调，更符合教育气质)
+// 2. 核心数据
 const schoolStats = ref([
-  { value: 'Top 1%', label: 'ESI全球学科排名', icon: Trophy, color: '#f56c6c' }, // 红
-  { value: '15+', label: '一级学科硕士点', icon: Star, color: '#e6a23c' },   // 橙
-  { value: '4', label: '顶尖优势学科', icon: Medal, color: '#409eff' },     // 蓝
+  { value: 'Top 1%', label: 'ESI全球学科排名', icon: Trophy, color: '#f56c6c' },
+  { value: '15+', label: '一级学科硕士点', icon: Star, color: '#e6a23c' },
+  { value: '4', label: '顶尖优势学科', icon: Medal, color: '#409eff' },
 ])
 
-// 3. 亮点数据 (技术栈亮点)
+// 3. ⭐ 核心亮点 (扩充至 6 个，填补空白，展示全栈能力)
 const highlights = ref([
-  { icon: Lightning, title: 'Redis 极速缓存', desc: '读写分离，性能飙升 50%', color: '#e6a23c' },
-  { icon: Cloudy, title: 'OSS 云端存储', desc: '海量资源，CDN 全球分发', color: '#409eff' },
-  { icon: Lock, title: 'JWT 安全卫士', desc: '无状态令牌，精准权限控制', color: '#67c23a' },
-  { icon: Document, title: 'Swagger 文档', desc: '接口可视，开发协作无忧', color: '#f56c6c' }
+  { 
+    icon: MapLocation, 
+    title: '沉浸式导览', 
+    desc: '集成百度地图 GL，支持 3D 视角飞行与自定义标记，云游衢州零距离。', 
+    color: '#409eff',
+    bg: '#ecf5ff'
+  },
+  { 
+    icon: PieChart, 
+    title: '数据驾驶舱', 
+    desc: '基于 ECharts 构建动态报表，多维度透视用户增长与景点热度趋势。', 
+    color: '#e6a23c',
+    bg: '#fdf6ec'
+  },
+  { 
+    icon: Lightning, 
+    title: 'Redis 高并发', 
+    desc: '采用读写分离架构，热点数据秒级响应，轻松支撑高频点赞交互。', 
+    color: '#f56c6c',
+    bg: '#fef0f0' 
+  },
+  { 
+    icon: Odometer, 
+    title: '服务监控', 
+    desc: '实时感知服务器脉搏，CPU、内存、JVM 运行状态一目了然 (OSHI)。', 
+    color: '#67c23a',
+    bg: '#f0f9eb' 
+  },
+  { 
+    icon: View, 
+    title: '全链路审计', 
+    desc: '基于 AOP 切面编程，自动记录关键操作日志，行为可追溯、可分析。', 
+    color: '#909399',
+    bg: '#f4f4f5' 
+  },
+  { 
+    icon: Cloudy, 
+    title: 'OSS 云存储', 
+    desc: '接入阿里云对象存储，海量图片资源云端托管，CDN 全球加速分发。', 
+    color: '#409eff', // 复用蓝色
+    bg: '#ecf5ff' 
+  }
 ])
 
-// 4. 时光机控制
+// 4. 时光机数据
 const showHistory = ref(false)
 const historyEvents = [
   { year: '1978', title: '建校伊始', desc: '学校前身杭州计量学校成立，开启计量教育新篇章。' },
@@ -42,7 +80,37 @@ const historyEvents = [
   { year: '2025', title: '未来可期', desc: '全栈信息管理系统上线，数字化建设迈上新台阶！' }
 ]
 
-// 简单的入场动画控制
+// 5. 技术栈数据 
+const techStack = ref([
+  {
+    category: '前端 (Frontend)',
+    icon: Monitor, 
+    items: [
+      { name: 'Vue 3', type: 'success', logo: 'https://cdn.simpleicons.org/vue.js/4FC08D' },
+      { name: 'Vite', type: 'warning', logo: 'https://cdn.simpleicons.org/vite/646CFF' },
+      { name: 'Element Plus', type: 'primary', logo: 'techStack/elementplus.ico' }
+    ]
+  },
+  {
+    category: '后端 (Backend)',
+    icon: Cpu,
+    items: [
+      { name: 'Spring Boot', type: 'success', logo: 'https://cdn.simpleicons.org/springboot/6DB33F' },
+      { name: 'MyBatis', type: 'info', logo: 'techStack/mybatis.ico' },
+      { name: 'Java 17', type: 'danger', logo: 'techStack/java17.ico' }
+    ]
+  },
+  {
+    category: '数据与云 (Data & Cloud)',
+    icon: Coin,
+    items: [
+      { name: 'Redis', type: 'danger', logo: 'techStack/redis.ico' },
+      { name: 'MySQL 8.0', type: 'primary', logo: 'https://cdn.simpleicons.org/mysql/4479A1' },
+      { name: 'Aliyun OSS', type: 'warning', logo: 'https://cdn.simpleicons.org/alibabacloud/FF6A00' }
+    ]
+  }
+])
+
 const isMounted = ref(false)
 onMounted(() => {
   setTimeout(() => { isMounted.value = true }, 100)
@@ -151,38 +219,35 @@ onMounted(() => {
     </el-collapse-transition>
 
     <div class="bottom-grid">
+      
       <el-card class="tech-card hover-lift" shadow="hover">
         <template #header>
-          <div class="card-header"><el-icon><Trophy /></el-icon> <span>全栈架构</span></div>
+          <div class="card-header"><el-icon><Trophy /></el-icon> <span>全栈技术架构</span></div>
         </template>
-        <div class="tech-tags">
-          <div class="tag-group">
-            <span class="group-label">Front</span>
-            <el-tag type="success" effect="light">Vue 3</el-tag>
-            <el-tag type="info" effect="plain">Vite</el-tag>
-            <el-tag effect="plain">Element Plus</el-tag>
-          </div>
-          <div class="tag-group">
-            <span class="group-label">Back</span>
-            <el-tag type="success" effect="dark">Spring Boot</el-tag>
-            <el-tag type="warning" effect="plain">MyBatis-Plus</el-tag>
-          </div>
-          <div class="tag-group">
-            <span class="group-label">Data</span>
-            <el-tag type="danger" effect="light">Redis</el-tag>
-            <el-tag type="info" effect="light">MySQL</el-tag>
-            <el-tag color="#fdf6ec" style="color:#e6a23c; border:none;">Aliyun OSS</el-tag>
+        
+        <div class="tech-stack-container">
+          <div class="tech-row" v-for="(group, idx) in techStack" :key="idx">
+            <div class="row-label">
+              <el-icon><component :is="group.icon" /></el-icon>
+              <span>{{ group.category }}</span>
+            </div>
+            <div class="row-items">
+              <div class="tech-pill" v-for="(item, i) in group.items" :key="i" :class="item.type">
+                <img :src="item.logo" class="tech-logo" onerror="this.style.display='none'" />
+                <span class="tech-name">{{ item.name }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </el-card>
 
       <el-card class="highlight-card hover-lift" shadow="hover">
         <template #header>
-          <div class="card-header"><el-icon><Star /></el-icon> <span>核心亮点</span></div>
+          <div class="card-header"><el-icon><Star /></el-icon> <span>项目核心亮点</span></div>
         </template>
         <div class="highlight-list">
-          <div class="hl-item" v-for="(hl, i) in highlights" :key="i">
-            <div class="hl-icon" :style="{ background: hl.color }">
+          <div class="hl-item" v-for="(hl, i) in highlights" :key="i" :style="{ backgroundColor: hl.bg }">
+            <div class="hl-icon" :style="{ color: hl.color, backgroundColor: '#fff' }">
               <el-icon><component :is="hl.icon" /></el-icon>
             </div>
             <div class="hl-info">
@@ -217,7 +282,7 @@ onMounted(() => {
 
 /* ================= Hero 区域 ================= */
 .hero-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); /* 更清新的绿色渐变 */
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
   border: 1px solid #e1f3d8;
   border-radius: 16px;
   position: relative;
@@ -321,7 +386,6 @@ onMounted(() => {
 .accordion-item:hover { flex: 4; }
 .accordion-item:hover .accordion-img { filter: brightness(1.05); transform: translate(-50%, -50%) scale(1.05); }
 
-/* 文字遮罩 */
 .accordion-overlay {
   position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent 50%);
   opacity: 0; transition: opacity 0.4s;
@@ -368,23 +432,87 @@ onMounted(() => {
 .hover-lift { transition: transform 0.3s, box-shadow 0.3s; }
 .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
 
-.tech-tags { display: flex; flex-direction: column; gap: 18px; padding: 10px 0; }
-.tag-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.group-label { width: 50px; font-size: 13px; font-weight: 800; color: #909399; text-transform: uppercase; letter-spacing: 0.5px; }
+/* 技术栈样式 (图标版) */
+.tech-stack-container {
+  display: flex; flex-direction: column; gap: 20px; padding: 5px 0;
+}
 
-.highlight-list { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 5px 0; }
-.hl-item { display: flex; align-items: flex-start; gap: 12px; }
-.hl-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.hl-title { font-size: 15px; font-weight: bold; color: #303133; margin-bottom: 2px; }
-.hl-desc { font-size: 12px; color: #999; line-height: 1.4; }
+.tech-row {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.row-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 700; color: #909399; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.row-items {
+  display: flex; flex-wrap: wrap; gap: 10px;
+}
+
+/* 技术胶囊 */
+.tech-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  background: #f4f4f5; color: #606266;
+  border: 1px solid #e9e9eb;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: default;
+}
+
+.tech-logo {
+  width: 16px; height: 16px; object-fit: contain;
+}
+
+/* 不同类型的配色 */
+.tech-pill.success { background: #f0f9eb; border-color: #e1f3d8; color: #67c23a; }
+.tech-pill.primary { background: #ecf5ff; border-color: #d9ecff; color: #409eff; }
+.tech-pill.warning { background: #fdf6ec; border-color: #faecd8; color: #e6a23c; }
+.tech-pill.danger  { background: #fef0f0; border-color: #fde2e2; color: #f56c6c; }
+.tech-pill.info    { background: #f4f4f5; border-color: #e9e9eb; color: #909399; }
+
+.tech-pill:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
+.tech-pill.success:hover { background: #67c23a; color: #fff; border-color: #67c23a; }
+.tech-pill.primary:hover { background: #409eff; color: #fff; border-color: #409eff; }
+.tech-pill.warning:hover { background: #e6a23c; color: #fff; border-color: #e6a23c; }
+.tech-pill.danger:hover  { background: #f56c6c; color: #fff; border-color: #f56c6c; }
+.tech-pill.info:hover    { background: #909399; color: #fff; border-color: #909399; }
+.tech-pill:hover .tech-logo { filter: brightness(0) invert(1); }
+
+/* ⭐ 核心亮点列表样式 (优化版) */
+.highlight-list { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; /* 两列 */
+  gap: 15px; 
+  padding: 5px 0; 
+}
+.hl-item { 
+  display: flex; 
+  align-items: flex-start; 
+  gap: 12px; 
+  padding: 12px;
+  border-radius: 10px;
+  transition: transform 0.3s;
+}
+.hl-item:hover { transform: scale(1.02); }
+
+.hl-icon { 
+  width: 36px; height: 36px; border-radius: 8px; 
+  display: flex; align-items: center; justify-content: center; 
+  flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.05); 
+}
+.hl-title { font-size: 14px; font-weight: bold; color: #303133; margin-bottom: 4px; }
+.hl-desc { font-size: 12px; color: #606266; line-height: 1.4; }
 
 /* 响应式适配 */
 @media (max-width: 900px) {
   .intro-section { flex-direction: column; height: auto; }
   .intro-right { height: 350px; }
   .bottom-grid { flex-direction: column; }
+  .highlight-list { grid-template-columns: 1fr; } /* 移动端改为单列 */
   .timeline-box { flex-direction: column; gap: 30px; padding-left: 20px; }
-  .timeline-line { display: none; } /* 移动端隐藏横线 */
+  .timeline-line { display: none; }
   .timeline-item { width: 100%; text-align: left; flex-direction: row; gap: 15px; align-items: flex-start; }
   .year-bubble { margin-bottom: 0; width: 60px; text-align: center; flex-shrink: 0; }
   .event-point { display: none; }

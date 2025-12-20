@@ -100,7 +100,7 @@ const total = ref(0)
 
 const queryParams = reactive({
   page: 1,
-  pageSize: 10, // 时间轴模式下每页稍微少一点，体验更好
+  pageSize: 10, 
   username: '',
   operation: ''
 })
@@ -112,7 +112,6 @@ const getList = async () => {
   try {
     const res = await getLogList(queryParams)
     if (res.code === 1) {
-      // ★★★ 修复点：这里改成 rows ★★★
       logList.value = res.data.rows 
       total.value = res.data.total
     } else {
