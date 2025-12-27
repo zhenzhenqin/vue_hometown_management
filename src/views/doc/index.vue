@@ -34,13 +34,13 @@ import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark-dimmed.css'
 
 // --- 📝 项目核心文档 (Markdown) ---
-// 注意：下面的代码块符号 ``` 前面都加了反斜杠 \ 转义，这是必须的！
+// ✨ 关键修复：所有的代码块符号 ``` 都已转义为 \`\`\`，防止 Vue 编译器报错
 const markdownContent = `
 # 衢州地区信息管理系统 (Hometown Management System)
 
-> **版本**: v1.0.4
-> **开发者**: 毛靖晨 (23H034160336)  
-> **状态**: 🚀 已上线 (Stable)
+> **版本**: v1.0.5
+> **开发者**: mjc (23H034160336)  
+> **状态**: 🟢 已部署 (Stable)
 
 ---
 
@@ -48,10 +48,7 @@ const markdownContent = `
 
 本项目是一个致力于**弘扬衢州文化、推广地方特色**的全栈信息管理平台。系统集成了**文化遗产展示、特产推广、旅游景点导航**以及**后台数据可视化管理**等功能。
 
-项目采用**前后端分离**架构，分为三个独立子系统：
-1.  **后端服务 (Core Server)**: 基于 Spring Boot 的核心业务逻辑与数据接口。
-2.  **管理后台 (Admin Dashboard)**: 基于 Vue3 + Element Plus 的数据管理与可视化平台。
-3.  **用户前台 (User Client)**: 面向游客的沉浸式文化展示门户。
+**v1.0.5 核心升级**：重点增强了系统的**安全性**与**审计能力**，全面实装了**IP属地监控系统**，并优化了底层数据库交互逻辑。
 
 ---
 
@@ -61,20 +58,20 @@ const markdownContent = `
 -   **核心框架**: Spring Boot 2.7.x
 -   **ORM**: MyBatis / MyBatis-Plus
 -   **数据库**: MySQL 8.0
+-   **IP解析**: **Ip2Region (离线 IP 库，毫秒级查询)** [NEW]
 -   **缓存**: Redis (用于会话管理与热点数据缓存)
--   **安全**: JWT (JSON Web Token) 鉴权, 拦截器机制
+-   **安全**: JWT (JSON Web Token) 鉴权
 -   **监控**: OSHI (System Hardware Information) 
--   **工具**: Swagger/Knife4j (接口文档), Lombok, FastJSON
+-   **工具**: Swagger/Knife4j, Lombok, FastJSON
 -   **云服务**: 阿里云 OSS (对象存储)
 
 ### 💻 前端 (Frontend)
 -   **框架**: Vue 3 (Composition API)
 -   **构建**: Vite 4.x
--   **UI 组件库**: Element Plus
+-   **UI 组件库**: Element Plus (表格自适应优化)
 -   **图表**: ECharts 5.x (数据大屏)
 -   **地图**: 百度地图 JavaScript API GL
--   **路由**: Vue Router 4
--   **HTTP**: Axios (封装请求拦截器)
+-   **HTTP**: Axios
 
 ---
 
@@ -82,70 +79,95 @@ const markdownContent = `
 
 \`\`\`mermaid
 graph TD
-    User[用户] -->|浏览/交互| Client(用户前台)
-    Admin[管理员] -->|管理数据| Dashboard(管理后台)
-    
-    Client -->|API 请求| Gateway[Nginx / 网关]
-    Dashboard -->|API 请求| Gateway
-    
+    User[用户/管理员] -->|登录/操作| Gateway[Nginx / 网关]
     Gateway --> Server(Spring Boot 后端)
     
+    subgraph "核心服务层"
+    Server -->|解析IP| Ip2Region[IP 属地库]
     Server -->|读写| DB[(MySQL 数据库)]
     Server -->|缓存| Cache[(Redis)]
     Server -->|监控| Hardware[OSHI 硬件监控]
-    Server -->|存储图片| OSS[阿里云 OSS]
+    end
+    
+    subgraph "安全层"
+    Git[Git 仓库] --x|忽略| Sensitive[.yml 配置文件]
+    end
 \`\`\`
 
 ---
 
 ## 4. 核心功能模块 (Modules)
 
-### 🗺️ 分布地图 (Attraction Map) **[NEW]**
+### 👮 安全与审计 (Security & Audit) **[NEW]**
+-   **IP 属地监控**: 自动获取用户客户端 IP，离线解析出“省份·城市”（如：浙江·宁波），并记录在数据库中。
+-   **登录追踪**: 管理员和用户登录/注册时，自动更新最后登录 IP 和地点。
+-   **敏感信息保护**: 配置 Git 忽略规则，防止阿里云 AK/SK 泄露。
+
+### 🗺️ 分布地图 (Attraction Map)
 -   **全域导览**: 集成百度地图 GL，直观展示衢州所有景点的地理分布。
 -   **智能定位**: 支持数据库经纬度直接打点，同时也支持基于地址的自动解析兜底方案。
--   **沉浸体验**: 3D 倾斜视角 + 飞行跳转动画 (FlyTo)，提供流畅的云游体验。
+-   **沉浸体验**: 3D 倾斜视角 + 飞行跳转动画 (FlyTo)。
 
-### 🖥️ 服务监控 (Server Monitor) **[NEW]**
+### 🖥️ 服务监控 (Server Monitor)
 -   **实时仪表盘**: 实时监控服务器的 CPU 使用率、内存占用率。
 -   **环境信息**: 展示服务器操作系统、IP 地址、Java 版本、项目路径等。
--   **磁盘检测**: 自动扫描服务器磁盘分区及使用情况。
 
-### 🏛️ 文化遗产 (Culture)
--   **非遗展示**: 收录衢州各类非物质文化遗产。
--   **图文详情**: 支持富文本与高清大图展示。
--   **后台管理**: CRUD 操作，支持一键发布与下架。
-
-### 🍗 特产美食 (Specialties)
--   **特产名录**: 三头一掌、烤饼等特色美食介绍。
--   **推荐算法**: (计划中) 基于用户喜好的个性化推荐。
-
-### 📊 数据大屏 (Dashboard)
--   **实时监控**: 用户访问量、API 调用频率。
--   **可视化**: 使用 ECharts 展示“特产分类占比”、“热门景点排行”等图表。
-
-### 📝 日志审计 (Audit Log)
--   **操作日志**: 记录管理员的所有敏感操作 (新增、删除、修改)。
--   **登录日志**: 监控异常登录行为，保障系统安全。
+### 🏛️ 文化与特产 (Culture & Food)
+-   **非遗展示**: 收录衢州各类非物质文化遗产，支持富文本展示。
+-   **特产美食**: 三头一掌、烤饼等特色美食介绍。
 
 ---
 
 ## 5. 核心代码片段 (Code Snippets)
 
-### 📡 1. OSHI 获取系统信息 (Java)
+### 🌍 1. IP 属地智能解析 (Java) **[NEW]**
+\`\`\`java
+/**
+ * 根据 IP 解析城市信息
+ * 输入: 110.19.106.1 -> 输出: 浙江·宁波
+ */
+public static String getCityInfo(String ip) {
+    try {
+        // 1. 查询 IP 库 (格式: 国家|区域|省份|城市|ISP)
+        String region = searcher.search(ip);
+        String[] parts = region.split("\\\\|"); // 转义管道符
+        
+        // 2. 提取并简化
+        String province = parts[2];
+        String city = parts[3];
+        
+        // 3. 智能拼接
+        return simplifyArea(province) + "·" + simplifyArea(city);
+    } catch (Exception e) {
+        return "未知";
+    }
+}
+\`\`\`
+
+### 🔧 2. MyBatis 动态更新修复 (XML) **[NEW]**
+\`\`\`xml
+<update id="updateIpAndCity">
+    update user
+    <set>
+        <if test="ip != null">ip = #{ip},</if>
+        <if test="city != null">city = #{city},</if>
+        update_time = now(), </set>
+    where id = #{id}
+</update>
+\`\`\`
+
+### 📡 3. OSHI 获取系统信息 (Java)
 \`\`\`java
 public void copyTo() throws Exception {
     SystemInfo si = new SystemInfo();
     HardwareAbstractionLayer hal = si.getHardware();
-
     setCpuInfo(hal.getProcessor());
     setMemInfo(hal.getMemory());
     setSysInfo();
-    setJvmInfo();
-    setSysFiles(si.getOperatingSystem());
 }
 \`\`\`
 
-### 🗺️ 2. 百度地图智能打点 (JavaScript)
+### 🗺️ 4. 百度地图智能打点 (JavaScript)
 \`\`\`javascript
 const addCreativeMarker = (item) => {
   // 🟢 优先使用数据库经纬度 (高性能)
@@ -153,9 +175,9 @@ const addCreativeMarker = (item) => {
     const point = new BMapGL.Point(item.longitude, item.latitude)
     createMarkerLogic(point, item)
   } else {
-    // 🟡 兜底：使用地址解析 (兼容旧数据)
+    // 🟡 兜底：使用地址解析
     const myGeo = new BMapGL.Geocoder()
-    myGeo.getPoint('衢州市 ' + (item.location || item.name), (p) => {
+    myGeo.getPoint('衢州市 ' + item.name, (p) => {
       if (p) createMarkerLogic(p, item)
     }, '衢州市')
   }
@@ -166,15 +188,9 @@ const addCreativeMarker = (item) => {
 
 ## 6. 部署指南 (Deployment)
 
-### 环境要求
--   JDK 1.8+
--   Node.js 16+
--   MySQL 5.7+
--   Redis 5.0+
-
 ### 启动步骤
-1.  **数据库**: 导入 \`init.sql\` (包含新增的 longitude/latitude 字段)。
-2.  **后端**: 修改 \`application.yml\` 中的 DB/Redis 配置，运行 \`HometownApplication.java\`。
+1.  **数据库**: 导入 \`init.sql\`。
+2.  **后端**: 修改 \`application.yml\` (注意不要提交到 Git)，运行 \`HometownApplication.java\`。
 3.  **前端**: 
     \`\`\`bash
     cd vue_hometown_management
@@ -186,20 +202,15 @@ const addCreativeMarker = (item) => {
 
 ## 7. 更新日志 (Changelog)
 
+-   **v1.0.5 (2025-12-28)**: 
+    -   ✨ **[Feature]** 全面实装 **IP 属地监控** 功能，支持用户/管理员登录时自动记录所在城市。
+    -   🐛 **[Bugfix]** 修复了 MyBatis \`update\` 语句中因多余逗号导致的 \`SQLSyntaxErrorException\`。
+    -   🔒 **[Security]** 修复了 Git 历史记录中的 **阿里云 AK 泄露** 问题，重构了 \`.gitignore\` 规则。
+    -   💄 **[UI]** 优化了后台管理表格，IP 归属地列支持自适应宽度。
+
 -   **v1.0.4 (2025-12-19)**:
     -   ✨ **[Feature]** 新增 **“分布地图”** 模块，支持全屏 3D 地图导览。
     -   ✨ **[Feature]** 新增 **“服务监控”** 模块，基于 OSHI 实时展示服务器状态。
-    -   🔧 **[Database]** \`attraction\` 表新增 \`longitude\` 和 \`latitude\` 字段。
-    -   💄 **[UI]** 优化了侧边栏布局，修复了地图页面的留白和遮挡问题。
-    -   🔒 **[Security]** 用户端点赞/差评增加登录拦截校验。
-
--   **v1.0.3 (2025-12-18)**: 
-    -   ✨ 新增“系统进化 (DevLog)”模块，支持多仓库提交记录查看。
-    -   🐛 修复了景点图片上传不显示的 Bug。
-
--   **v1.0.2 (2025-12-17)**: 
-    -   💄 优化后台 UI，增加赛博朋克风格组件。
-    -   📈 完善 ECharts 数据大屏。
 
 -   **v1.0.0 (2025-09-15)**: 
     -   🎉 项目初始化，完成基础 CRUD 功能。

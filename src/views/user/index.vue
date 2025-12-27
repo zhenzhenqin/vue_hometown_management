@@ -146,7 +146,7 @@ onMounted(() => {
 
         <el-table-column label="手机号" prop="phone" align="center" width="120" />
 
-        <el-table-column label="最后操作IP" prop="ip" align="center" width="135">
+        <el-table-column label="最后操作IP" prop="ip" align="center" width="200">
           <template #default="scope">
             <span class="mono-font">{{ scope.row.ip || '-' }}</span>
           </template>

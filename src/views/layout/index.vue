@@ -15,7 +15,7 @@ const router = useRouter()
 // 页脚信息 
 const footerInfo = ref({
   studentId: '23H034160336',
-  name: '毛靖晨',
+  name: 'mjc',
   email: '3378405015@qq.com',
   phone: '19817193250'
 })

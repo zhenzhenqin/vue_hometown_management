@@ -228,7 +228,7 @@ onMounted(() => {
       >
         <el-table-column type="index" label="序号" width="60" align="center" />
         
-        <el-table-column label="登录账号" prop="username" align="center" min-width="120">
+        <el-table-column label="登录账号" prop="username" align="center" width="180">
           <template #default="scope">
             <div v-if="scope.row.username === 'admin'" class="super-admin-tag">
               <el-icon><UserFilled /></el-icon> 超级管理员
@@ -239,17 +239,17 @@ onMounted(() => {
 
         <el-table-column label="真实姓名" prop="realName" align="center" width="100" />
         
-        <el-table-column label="最后登录IP" prop="ip" align="center" width="135">
+        <el-table-column label="最后登录IP" prop="ip" align="center" width="230">
           <template #default="scope">
             <span class="mono-font">{{ scope.row.ip || '-' }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="IP归属地" prop="location" align="center" width="140" show-overflow-tooltip>
+        <el-table-column label="IP归属地" prop="city" align="center" min-width="150" show-overflow-tooltip>
           <template #default="scope">
-            <el-tag v-if="scope.row.location" type="info" size="small" effect="light">
+            <el-tag v-if="scope.row.city" type="info" size="small" effect="light">
               <el-icon style="vertical-align: middle; margin-right: 2px"><Location /></el-icon>
-              {{ scope.row.location }}
+              {{ scope.row.city }}
             </el-tag>
             <span v-else class="text-gray">-</span>
           </template>
@@ -271,7 +271,7 @@ onMounted(() => {
           </template>
         </el-table-column>
 
-        <el-table-column label="创建时间" prop="createTime" align="center" width="220">
+        <el-table-column label="创建时间" prop="createTime" align="center" width="170">
           <template #default="scope">
             <span class="mono-font" style="font-size: 12px;">
               {{ scope.row.createTime ? scope.row.createTime.replace('T', ' ') : '-' }}
@@ -279,7 +279,7 @@ onMounted(() => {
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" width="200" fixed="right">
+        <el-table-column label="操作" align="center" width="140" fixed="right">
           <template #default="scope">
             <div v-if="scope.row.username !== 'admin'" class="action-buttons">
               <el-button 
