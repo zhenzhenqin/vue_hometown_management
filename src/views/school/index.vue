@@ -6,7 +6,7 @@ import {
   Lightning, Cloudy, Lock, Document,
   Location, Reading, Medal, Timer, ArrowDown, ArrowUp,
   Platform, Coin, Cpu,
-  MapLocation, PieChart, View // 新增图标
+  MapLocation, PieChart, View 
 } from '@element-plus/icons-vue'
 
 // 1. 手风琴画廊数据
@@ -21,10 +21,10 @@ const sceneryList = ref([
 const schoolStats = ref([
   { value: 'Top 1%', label: 'ESI全球学科排名', icon: Trophy, color: '#f56c6c' },
   { value: '15+', label: '一级学科硕士点', icon: Star, color: '#e6a23c' },
-  { value: '4', label: '顶尖优势学科', icon: Medal, color: '#409eff' },
+  { value: '6', label: '顶尖优势学科', icon: Medal, color: '#409eff' },
 ])
 
-// 3. ⭐ 核心亮点 (扩充至 6 个，填补空白，展示全栈能力)
+// 3. 核心亮点
 const highlights = ref([
   { 
     icon: MapLocation, 
@@ -65,7 +65,7 @@ const highlights = ref([
     icon: Cloudy, 
     title: 'OSS 云存储', 
     desc: '接入阿里云对象存储，海量图片资源云端托管，CDN 全球加速分发。', 
-    color: '#409eff', // 复用蓝色
+    color: '#409eff', 
     bg: '#ecf5ff' 
   }
 ])
@@ -80,7 +80,7 @@ const historyEvents = [
   { year: '2025', title: '未来可期', desc: '全栈信息管理系统上线，数字化建设迈上新台阶！' }
 ]
 
-// 5. 技术栈数据 
+// 5. 技术栈数据 (完全保留你的配置)
 const techStack = ref([
   {
     category: '前端 (Frontend)',
@@ -88,16 +88,18 @@ const techStack = ref([
     items: [
       { name: 'Vue 3', type: 'success', logo: 'https://cdn.simpleicons.org/vue.js/4FC08D' },
       { name: 'Vite', type: 'warning', logo: 'https://cdn.simpleicons.org/vite/646CFF' },
-      { name: 'Element Plus', type: 'primary', logo: 'techStack/elementplus.ico' }
+      { name: 'Element Plus', type: 'primary', logo: 'techStack/elementplus.ico'},
+      { name: 'Baidu Map GL', type: 'primary', logo: 'https://cdn.simpleicons.org/baidu/0052CC' },
+      { name: 'ECharts 5', type: 'danger', logo: 'https://cdn.simpleicons.org/apacheecharts/AA344D' }
     ]
   },
   {
     category: '后端 (Backend)',
     icon: Cpu,
     items: [
-      { name: 'Spring Boot', type: 'success', logo: 'https://cdn.simpleicons.org/springboot/6DB33F' },
-      { name: 'MyBatis', type: 'info', logo: 'techStack/mybatis.ico' },
-      { name: 'Java 17', type: 'danger', logo: 'techStack/java17.ico' }
+      { name: 'Spring Boot 3', type: 'success', logo: 'https://cdn.simpleicons.org/springboot/6DB33F' },
+      { name: 'MyBatis', type: 'info', logo: 'techStack/mybatis.ico'}, 
+      { name: 'Java 17', type: 'danger', logo: 'techStack/java17.ico'}
     ]
   },
   {
@@ -131,8 +133,18 @@ onMounted(() => {
               <span class="badge-pill green">2025-2026 学年</span>
               <span class="badge-pill gray">Web 期末大作业</span>
             </div>
+            
             <h1 class="main-title">衢州地区信息管理系统</h1>
-            <p class="sub-title">China Jiliang University · 中国计量大学</p>
+            
+            <div class="subtitle-row">
+              <p class="sub-title">China Jiliang University · 中国计量大学</p>
+              
+              <div class="location-pill">
+                <el-icon class="loc-icon-pulse"><Location /></el-icon> 
+                <span class="loc-text">中国•杭州</span>
+              </div>
+            </div>
+
           </div>
         </div>
         <div class="hero-decoration"></div>
@@ -149,7 +161,9 @@ onMounted(() => {
           </div>
           
           <div class="desc-text">
-            <p>坐落于<span class="highlight-word">杭州</span>，这是一所流淌着精准基因的高等学府。我们用代码丈量世界，用数据感知未来。</p>
+            <p>
+              坐落于<span class="highlight-word">杭州</span>，这是一所流淌着精准基因的高等学府。我们用代码丈量世界，用数据感知未来。
+            </p>
           </div>
 
           <div class="stats-grid">
@@ -302,13 +316,53 @@ onMounted(() => {
 }
 .hover-pulse:hover { transform: scale(1.05); }
 
+.text-box { display: flex; flex-direction: column; justify-content: center; }
+
 .text-box .main-title {
   font-size: 32px; font-weight: 800; color: #1a5e38; margin: 8px 0; letter-spacing: 1px;
   background: linear-gradient(to right, #1a5e38, #409eff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.text-box .sub-title { color: #666; font-size: 16px; margin: 0; font-weight: 500;}
+
+/* ✨ 创意排版：副标题行 */
+.subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sub-title { color: #666; font-size: 16px; margin: 0; font-weight: 500;}
+
+/* 📍 坐标胶囊样式 */
+.location-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(245, 108, 108, 0.3);
+  padding: 2px 10px;
+  border-radius: 20px;
+  color: #f56c6c;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s;
+  box-shadow: 0 2px 6px rgba(245, 108, 108, 0.1);
+}
+.location-pill:hover {
+  background: #fef0f0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(245, 108, 108, 0.2);
+}
+.loc-icon-pulse { animation: bounce 1.5s infinite; font-size: 14px; }
+.loc-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.5px; }
+
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+
+
 .badges { display: flex; gap: 8px; font-size: 12px; font-weight: bold; }
 .badge-pill { padding: 2px 8px; border-radius: 4px; }
 .badge-pill.green { background: #e1f3d8; color: #1a5e38; }
@@ -432,7 +486,7 @@ onMounted(() => {
 .hover-lift { transition: transform 0.3s, box-shadow 0.3s; }
 .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
 
-/* 技术栈样式 (图标版) */
+/* 技术栈样式 */
 .tech-stack-container {
   display: flex; flex-direction: column; gap: 20px; padding: 5px 0;
 }
@@ -480,7 +534,7 @@ onMounted(() => {
 .tech-pill.info:hover    { background: #909399; color: #fff; border-color: #909399; }
 .tech-pill:hover .tech-logo { filter: brightness(0) invert(1); }
 
-/* ⭐ 核心亮点列表样式 (优化版) */
+/* 核心亮点列表样式 */
 .highlight-list { 
   display: grid; 
   grid-template-columns: 1fr 1fr; /* 两列 */
@@ -510,7 +564,7 @@ onMounted(() => {
   .intro-section { flex-direction: column; height: auto; }
   .intro-right { height: 350px; }
   .bottom-grid { flex-direction: column; }
-  .highlight-list { grid-template-columns: 1fr; } /* 移动端改为单列 */
+  .highlight-list { grid-template-columns: 1fr; } 
   .timeline-box { flex-direction: column; gap: 30px; padding-left: 20px; }
   .timeline-line { display: none; }
   .timeline-item { width: 100%; text-align: left; flex-direction: row; gap: 15px; align-items: flex-start; }

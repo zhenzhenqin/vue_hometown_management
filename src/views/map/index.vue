@@ -88,7 +88,7 @@ const loadAndMarkAttractions = async () => {
   }
 }
 
-// ✨ 新增：慢速队列处理函数
+//慢速队列处理函数
 const processQueueSlowly = async (list) => {
   for (const item of list) {
     // 尝试解析地址
@@ -102,7 +102,6 @@ const processQueueSlowly = async (list) => {
     }, '衢州市')
 
     // 强制等待 300 毫秒再处理下一个
-    // 这样 1 秒钟最多请求 3 次，绝对安全
     await new Promise(resolve => setTimeout(resolve, 300))
   }
 }
@@ -133,7 +132,7 @@ const addMarker = (point, item) => {
   const infoWindow = new BMapGL.InfoWindow(content, {
     width: 240,
     height: 240,
-    title: '', // 标题已经在 content 里写了
+    title: '', 
     enableMessage: false
   })
   

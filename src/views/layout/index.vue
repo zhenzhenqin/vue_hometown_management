@@ -61,6 +61,10 @@ const passDialogVisible = ref(false)
 const passFormRef = ref(null)
 const passForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' })
 
+//获取用户id
+const admin = JSON.parse(localStorage.getItem('adminInfo'))
+adminId.value = admin.id
+
 const validatePass2 = (rule, value, callback) => {
   if (value === '') callback(new Error('请再次输入密码'))
   else if (value !== passForm.value.newPassword) callback(new Error('两次输入密码不一致!'))
@@ -83,7 +87,7 @@ const submitPassword = () => {
     if (valid) {
       try {
         const res = await updatePassword({
-          id: adminId.value, // 注意参数名需跟后端DTO一致
+          adminId: adminId.value, 
           oldPassword: passForm.value.oldPassword,
           newPassword: passForm.value.newPassword
         })
