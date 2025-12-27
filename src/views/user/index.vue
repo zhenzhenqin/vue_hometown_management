@@ -1,8 +1,15 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, RefreshLeft, User, Lock, Unlock } from '@element-plus/icons-vue'
-import { getUserPage, startOrStopUser } from '@/api/user' // 引入刚才定义的API
+import { 
+  Search, 
+  RefreshLeft, 
+  Lock, 
+  Unlock, 
+  Location, 
+  Monitor 
+} from '@element-plus/icons-vue'
+import { getUserPage, startOrStopUser } from '@/api/user'
 
 // --- 数据定义 ---
 const loading = ref(false)
@@ -13,8 +20,8 @@ const total = ref(0)
 const queryParams = reactive({
   page: 1,
   pageSize: 10,
-  username: '', // 用户名搜索
-  status: ''    // 状态搜索
+  username: '', 
+  status: ''    
 })
 
 // --- 方法定义 ---
@@ -25,7 +32,7 @@ const fetchList = async () => {
   try {
     const res = await getUserPage(queryParams)
     if (res.code === 1) {
-      tableData.value = res.data.records || res.data.rows // 根据后端PageResult结构适配
+      tableData.value = res.data.records || res.data.rows 
       total.value = res.data.total
     } else {
       ElMessage.error(res.msg || '获取数据失败')
@@ -50,10 +57,10 @@ const resetQuery = () => {
   handleSearch()
 }
 
-// 3. 切换用户状态（拉黑/解除）
+// 3. 切换用户状态
 const handleStatusChange = (row) => {
   const text = row.status === 1 ? '拉黑' : '解除拉黑'
-  const newStatus = row.status === 1 ? 0 : 1 // 假设 1是启用，0是禁用
+  const newStatus = row.status === 1 ? 0 : 1 
   
   ElMessageBox.confirm(`确认要"${text}"用户 "${row.username}" 吗?`, '警告', {
     confirmButtonText: '确定',
@@ -64,21 +71,16 @@ const handleStatusChange = (row) => {
       const res = await startOrStopUser(newStatus, row.id)
       if (res.code === 1) {
         ElMessage.success(`${text}成功`)
-        row.status = newStatus // 更新本地状态
+        row.status = newStatus 
       } else {
-        // 失败则回滚开关状态（如果是用el-switch直接绑定的row.status，需要这一步）
         ElMessage.error(res.msg || '操作失败')
-        fetchList() // 刷新列表以保证状态一致
+        fetchList() 
       }
     } catch (error) {
       ElMessage.error('系统错误')
       fetchList()
     }
-  }).catch(() => {
-    // 取消操作，如果使用了v-model绑定，这里可能需要回滚UI状态
-    // 为简单起见，el-switch 的 :before-change 也可以处理，或者直接刷新列表
-    fetchList()
-  })
+  }).catch(() => {})
 }
 
 // 分页事件
@@ -130,41 +132,69 @@ onMounted(() => {
         :data="tableData" 
         border 
         style="width: 100%"
-        :header-cell-style="{ background: '#f5f7fa', color: '#606266' }"
+        :header-cell-style="{ background: '#f5f7fa', color: '#606266', fontWeight: '600' }"
       >
         <el-table-column type="index" label="序号" width="60" align="center" />
         
-        <el-table-column label="用户名" prop="username" align="center" min-width="120" />
+        <el-table-column label="用户名" prop="username" align="center" width="120" show-overflow-tooltip />
         
-        <el-table-column label="真实姓名" prop="realName" align="center" min-width="120">
+        <el-table-column label="真实姓名" prop="realName" align="center" min-width="100">
           <template #default="scope">
             {{ scope.row.realName || '-' }}
           </template>
         </el-table-column>
 
-        <el-table-column label="手机号" prop="phone" align="center" width="150" />
+        <el-table-column label="手机号" prop="phone" align="center" width="120" />
 
-        <el-table-column label="状态" align="center" width="150">
+        <el-table-column label="最后操作IP" prop="ip" align="center" width="135">
           <template #default="scope">
-            <el-tag v-if="scope.row.status === 1" type="success">正常</el-tag>
-            <el-tag v-else type="danger">已拉黑</el-tag>
+            <span class="mono-font">{{ scope.row.ip || '-' }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="注册时间" prop="createTime" align="center" width="180">
+        <el-table-column label="当前城市" prop="city" align="center" width="150" show-overflow-tooltip>
           <template #default="scope">
-            {{ scope.row.createTime ? scope.row.createTime.replace('T', ' ') : '-' }}
+            <div v-if="scope.row.city" class="location-cell">
+              <el-icon><Location /></el-icon>
+              <span>{{ scope.row.city }}</span>
+            </div>
+            <span v-else>-</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" width="180" fixed="right">
+        <el-table-column label="注册城市" prop="registerCity" align="center" width="150" show-overflow-tooltip>
+          <template #default="scope">
+            <div v-if="scope.row.registerCity" class="location-cell">
+              <el-icon><Monitor /></el-icon>
+              <span>{{ scope.row.registerCity }}</span>
+            </div>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="状态" align="center" width="80">
+          <template #default="scope">
+            <el-tag v-if="scope.row.status === 1" type="success" effect="light">正常</el-tag>
+            <el-tag v-else type="danger" effect="light">已拉黑</el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="注册时间" prop="createTime" align="center" width="165">
+          <template #default="scope">
+            <span class="mono-font" style="font-size: 12px;">
+              {{ scope.row.createTime ? scope.row.createTime.replace('T', ' ') : '-' }}
+            </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" align="center" width="120" fixed="right">
           <template #default="scope">
             <el-button 
               v-if="scope.row.status === 1"
               type="danger" 
+              link
               size="small" 
               :icon="Lock"
-              plain
               @click="handleStatusChange(scope.row)"
             >
               拉黑
@@ -172,9 +202,9 @@ onMounted(() => {
             <el-button 
               v-else
               type="success" 
+              link
               size="small" 
               :icon="Unlock"
-              plain
               @click="handleStatusChange(scope.row)"
             >
               解除
@@ -200,25 +230,29 @@ onMounted(() => {
 
 <style scoped>
 .user-manage-container {
-  padding: 20px;
+  padding: 24px;
   background-color: #f5f7fa;
   min-height: calc(100vh - 84px);
 }
 
 .page-title {
-  font-size: 24px;
-  color: #303133;
-  margin-bottom: 20px;
+  font-size: 22px;
+  color: #1f2937;
+  margin-bottom: 24px;
   font-weight: 600;
+  border-left: 4px solid #409eff;
+  padding-left: 12px;
 }
 
 .search-card {
   margin-bottom: 20px;
   border-radius: 8px;
+  border: none;
 }
 
 .table-card {
   border-radius: 8px;
+  border: none;
 }
 
 .pagination-bar {
@@ -227,10 +261,26 @@ onMounted(() => {
   justify-content: flex-end;
 }
 
-/* 按钮样式微调 */
-:deep(.el-button--danger.is-plain) {
-  --el-button-bg-color: #fef0f0;
-  --el-button-border-color: #fab6b6;
-  --el-button-text-color: #f56c6c;
+/* ✨ IP 专用等宽字体样式 */
+.mono-font {
+  font-family: "Menlo", "Monaco", "Consolas", "Courier New", monospace;
+  color: #606266;
+  font-size: 13px;
+  background: #f4f4f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* 城市显示样式 */
+.location-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #606266;
+}
+
+:deep(.el-table .cell) {
+  padding: 0 8px;
 }
 </style>

@@ -1,27 +1,43 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, RefreshLeft, Plus, Edit, UserFilled } from '@element-plus/icons-vue'
-// 引入API
-import { getAdminList, addAdmin, getAdminById, updateAdmin, changeAdminStatus } from '@/api/admin'
+import { 
+  Search, 
+  RefreshLeft, 
+  Plus, 
+  Edit, 
+  UserFilled, 
+  Location, 
+  Key 
+} from '@element-plus/icons-vue'
+// 引入API (确保你的 api/admin.js 中导出了这些方法)
+import { 
+  getAdminList, 
+  addAdmin, 
+  getAdminById, 
+  updateAdmin, 
+  changeAdminStatus 
+} from '@/api/admin'
 
-// --- 搜索与分页数据 ---
+// --- 1. 列表数据 ---
 const loading = ref(false)
 const tableData = ref([])
 const total = ref(0)
 const queryParams = reactive({
   page: 1,
   pageSize: 10,
-  username: '' // 根据 AdminQueryParam 只写了 username
+  username: ''
 })
 
-// --- 表单与弹窗数据 ---
+// --- 2. 表单与弹窗数据 ---
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const formRef = ref(null)
+
 const formData = reactive({
   id: null,
   username: '',
+  password: '', // ✨ 新增：密码字段
   realName: '',
   phone: '',
   email: '',
@@ -32,20 +48,25 @@ const formData = reactive({
 const rules = {
   username: [
     { required: true, message: '请输入登录账号', trigger: 'blur' },
-    { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+    { min: 3, max: 20, message: '账号长度 3-20 位', trigger: 'blur' }
+  ],
+  // ✨ 密码校验：仅在新增时生效 (通过 v-if 控制 DOM，校验逻辑自动适配)
+  password: [
+    { required: true, message: '请输入初始密码', trigger: 'blur' },
+    { min: 6, max: 20, message: '密码长度 6-20 位', trigger: 'blur' }
   ],
   realName: [
     { required: true, message: '请输入真实姓名', trigger: 'blur' }
   ],
   phone: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式', trigger: 'blur' }
+    { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
   ]
 }
 
 // ================= 方法定义 =================
 
-// 1. 获取列表数据
+// 获取列表
 const fetchList = async () => {
   loading.value = true
   try {
@@ -64,7 +85,7 @@ const fetchList = async () => {
   }
 }
 
-// 2. 搜索与重置
+// 搜索
 const handleSearch = () => {
   queryParams.page = 1
   fetchList()
@@ -74,48 +95,46 @@ const resetQuery = () => {
   handleSearch()
 }
 
-// 3. 启用/禁用状态切换
+// 状态切换
 const handleStatusChange = async (row) => {
-  // 双重保护：如果是 admin，禁止操作
   if (row.username === 'admin') {
-    row.status = 1 // 强制保持启用
+    row.status = 1
     ElMessage.warning('超级管理员无法被禁用')
     return
   }
-
   const text = row.status === 1 ? '启用' : '禁用'
-  
   try {
-    // 调用接口
     const res = await changeAdminStatus(row.status, row.id)
     if (res.code === 1) {
       ElMessage.success(`${text}成功`)
     } else {
-      // 失败回滚状态
-      row.status = row.status === 1 ? 0 : 1
+      row.status = row.status === 1 ? 0 : 1 // 失败回滚
       ElMessage.error(res.msg || '操作失败')
     }
   } catch (error) {
     row.status = row.status === 1 ? 0 : 1
-    ElMessage.error('系统错误')
+    ElMessage.error('操作失败')
   }
 }
 
-// 4. 打开新增弹窗
+// 打开新增
 const handleAdd = () => {
   dialogTitle.value = '新增管理员'
   dialogVisible.value = true
+  
   // 重置表单
   formData.id = null
   formData.username = ''
+  formData.password = '' 
   formData.realName = ''
   formData.phone = ''
   formData.email = ''
-  // 清除校验结果
+  formData.status = 1
+  
   if (formRef.value) formRef.value.resetFields()
 }
 
-// 5. 打开编辑弹窗
+// 打开编辑
 const handleEdit = async (id) => {
   dialogTitle.value = '编辑管理员'
   dialogVisible.value = true
@@ -124,28 +143,25 @@ const handleEdit = async (id) => {
   try {
     const res = await getAdminById(id)
     if (res.code === 1) {
-      // 回显数据
       Object.assign(formData, res.data)
+      formData.password = '' // ✨ 编辑模式下不回显密码
     }
   } catch (error) {
     ElMessage.error('获取详情失败')
   }
 }
 
-// 6. 提交表单 (新增或修改)
+// 提交表单
 const submitForm = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
       try {
         let res
         if (formData.id) {
-          // 修改
           res = await updateAdmin(formData)
         } else {
-          // 新增
           res = await addAdmin(formData)
         }
-
         if (res.code === 1) {
           ElMessage.success(formData.id ? '修改成功' : '新增成功')
           dialogVisible.value = false
@@ -160,7 +176,8 @@ const submitForm = () => {
   })
 }
 
-// 分页事件
+
+// 分页
 const handleSizeChange = (val) => {
   queryParams.pageSize = val
   fetchList()
@@ -170,7 +187,6 @@ const handleCurrentChange = (val) => {
   fetchList()
 }
 
-// 初始化
 onMounted(() => {
   fetchList()
 })
@@ -181,7 +197,7 @@ onMounted(() => {
     <h1 class="page-title">管理员管理</h1>
 
     <el-card class="search-card" shadow="hover">
-      <el-form :inline="true" :model="queryParams" class="search-form" size="medium">
+      <el-form :inline="true" :model="queryParams" class="search-form">
         <el-form-item label="登录账号">
           <el-input 
             v-model="queryParams.username" 
@@ -208,8 +224,7 @@ onMounted(() => {
         :data="tableData" 
         border 
         style="width: 100%"
-        size="medium"
-        :header-cell-style="{ background: '#f9fafb', color: '#4b5563', fontWeight: '500' }"
+        :header-cell-style="{ background: '#f9fafb', color: '#4b5563', fontWeight: '600' }"
       >
         <el-table-column type="index" label="序号" width="60" align="center" />
         
@@ -218,15 +233,31 @@ onMounted(() => {
             <div v-if="scope.row.username === 'admin'" class="super-admin-tag">
               <el-icon><UserFilled /></el-icon> 超级管理员
             </div>
-            <span v-else>{{ scope.row.username }}</span>
+            <span v-else class="username-text">{{ scope.row.username }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="真实姓名" prop="realName" align="center" min-width="120" />
-        <el-table-column label="手机号码" prop="phone" align="center" width="150" />
-        <el-table-column label="邮箱" prop="email" align="center" width="180" show-overflow-tooltip />
+        <el-table-column label="真实姓名" prop="realName" align="center" width="100" />
+        
+        <el-table-column label="最后登录IP" prop="ip" align="center" width="135">
+          <template #default="scope">
+            <span class="mono-font">{{ scope.row.ip || '-' }}</span>
+          </template>
+        </el-table-column>
 
-        <el-table-column label="账号状态" align="center" width="120">
+        <el-table-column label="IP归属地" prop="location" align="center" width="140" show-overflow-tooltip>
+          <template #default="scope">
+            <el-tag v-if="scope.row.location" type="info" size="small" effect="light">
+              <el-icon style="vertical-align: middle; margin-right: 2px"><Location /></el-icon>
+              {{ scope.row.location }}
+            </el-tag>
+            <span v-else class="text-gray">-</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="手机号码" prop="phone" align="center" width="120" />
+        
+        <el-table-column label="状态" align="center" width="80">
           <template #default="scope">
             <el-switch
               v-model="scope.row.status"
@@ -240,25 +271,28 @@ onMounted(() => {
           </template>
         </el-table-column>
 
-        <el-table-column label="创建时间" prop="createTime" align="center" width="170">
+        <el-table-column label="创建时间" prop="createTime" align="center" width="220">
           <template #default="scope">
-            {{ scope.row.createTime ? scope.row.createTime.replace('T', ' ') : '-' }}
+            <span class="mono-font" style="font-size: 12px;">
+              {{ scope.row.createTime ? scope.row.createTime.replace('T', ' ') : '-' }}
+            </span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" width="120">
+        <el-table-column label="操作" align="center" width="200" fixed="right">
           <template #default="scope">
-            <el-button 
-              v-if="scope.row.username !== 'admin'"
-              type="primary" 
-              size="small" 
-              @click="handleEdit(scope.row.id)" 
-              :icon="Edit" 
-              class="edit-btn"
-            >
-              编辑
-            </el-button>
-            <el-tag v-else type="info" size="small">不可操作</el-tag>
+            <div v-if="scope.row.username !== 'admin'" class="action-buttons">
+              <el-button 
+                type="primary" 
+                link 
+                size="small" 
+                @click="handleEdit(scope.row.id)" 
+                :icon="Edit"
+              >
+                编辑
+              </el-button>
+            </div>
+            <el-tag v-else type="info" size="small">禁止操作</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -282,14 +316,13 @@ onMounted(() => {
       :title="dialogTitle"
       width="500px"
       :close-on-click-modal="false"
-      center
       destroy-on-close
     >
       <el-form 
         ref="formRef" 
         :model="formData" 
         :rules="rules" 
-        label-width="100px" 
+        label-width="90px" 
         class="dialog-form"
       >
         <el-form-item label="登录账号" prop="username">
@@ -299,6 +332,20 @@ onMounted(() => {
             :disabled="!!formData.id"
           />
         </el-form-item>
+
+        <el-form-item 
+          label="初始密码" 
+          prop="password" 
+          v-if="!formData.id"
+        >
+          <el-input 
+            v-model="formData.password" 
+            placeholder="请输入初始密码" 
+            type="password" 
+            show-password
+          />
+        </el-form-item>
+
         <el-form-item label="真实姓名" prop="realName">
           <el-input v-model="formData.realName" placeholder="请输入真实姓名" />
         </el-form-item>
@@ -320,84 +367,103 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* 容器样式 */
 .admin-page-container {
   padding: 24px;
   background-color: #f5f7fa;
   min-height: 100vh;
 }
 
-/* 标题样式 */
 .page-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 24px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e5e7eb;
+  border-left: 4px solid #1a5e38;
+  padding-left: 12px;
 }
 
-/* 搜索区域 */
+/* 搜索区 */
 .search-card {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   border-radius: 8px;
   border: none;
 }
 .search-form {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 .search-input {
-  width: 240px;
+  width: 220px;
 }
 
-/* 操作栏 */
+/* 操作区 */
 .operation-bar {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 .add-btn {
-  padding: 8px 20px;
-  border-radius: 4px;
+  padding: 9px 20px;
 }
 
-/* 表格区域 */
+/* 表格区 */
 .table-card {
   margin-bottom: 20px;
   border-radius: 8px;
-  padding: 16px;
+  overflow: hidden;
 }
 
-/* 超级管理员标签 */
 .super-admin-tag {
-  color: #E6A23C;
+  color: #e6a23c;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
+  font-size: 13px;
+}
+.username-text {
+  font-weight: 500;
+  color: #333;
+}
+
+/* ✨ IP 专用等宽字体样式 */
+.mono-font {
+  font-family: "Menlo", "Monaco", "Consolas", "Courier New", monospace;
+  color: #606266;
+  font-size: 13px;
+  background: #f4f4f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.text-gray {
+  color: #c0c4cc;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* 分页 */
 .pagination-bar {
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 /* 弹窗 */
 .dialog-form {
-  margin-top: 10px;
   padding-right: 20px;
 }
 .dialog-footer {
   display: flex;
-  justify-content: center;
-  gap: 15px;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
-/* 统一按钮色调 (Green Theme 适配) */
+/* 主题色适配 */
 :deep(.el-button--primary) {
   --el-button-bg-color: #1a5e38;
   --el-button-border-color: #1a5e38;

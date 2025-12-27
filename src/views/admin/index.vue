@@ -1,11 +1,10 @@
 <template>
   <div class="page-container">
-    <!-- 页面标题 -->
     <div class="page-header">
       <h1>个人信息中心</h1>
       <el-button 
         type="primary" 
-        size="mini" 
+        size="small" 
         @click="fetchUserInfo"
         class="refresh-btn"
       >
@@ -13,123 +12,137 @@
       </el-button>
     </div>
 
-    <!-- 加载状态 -->
     <el-loading 
       v-if="loading" 
       :fullscreen="true" 
       text="加载中..." 
     ></el-loading>
 
-    <!-- 错误提示 -->
-    <el-alert 
-      v-if="error" 
-      :message="error" 
-      type="error" 
-      show-icon 
-      closable
-      @close="error = null"
-      class="error-alert"
-    ></el-alert>
-
     <div v-else class="content-wrapper">
-      <!-- 个人资料卡片 -->
-      <el-card class="profile-card">
+      <el-card class="profile-card" shadow="hover">
         <div class="profile-header">
-          <div class="avatar">
-            <el-icon class="avatar-icon"><User /></el-icon>
+          <div class="avatar-box">
+            <div class="avatar">
+              <el-icon class="avatar-icon"><User /></el-icon>
+            </div>
+            <el-tag size="small" type="info" class="ip-tag" v-if="user.ip">
+              IP: {{ user.ip }}
+            </el-tag>
           </div>
+          
           <div class="user-info">
-            <h2>{{ user.realName || user.username }}</h2>
+            <div class="name-row">
+              <h2>{{ user.realName || user.username }}</h2>
+              <el-tag v-if="user.location" type="success" size="small" effect="plain" class="location-badge">
+                <el-icon><Location /></el-icon> {{ user.location }}
+              </el-tag>
+            </div>
             <p>@{{ user.username }}</p>
           </div>
+          
           <el-button 
             type="primary" 
-            size="mini" 
+            plain
+            round
             @click="showEditDialog = true"
           >
             <el-icon><Edit /></el-icon> 编辑资料
           </el-button>
         </div>
         
-        <!-- 个性签名 -->
         <div class="signature">
-          <p>{{ user.introduction || '暂无个性签名' }}</p>
+          <p>
+            <el-icon><ChatDotRound /></el-icon> 
+            {{ user.introduction || '这个人很懒，什么都没写~' }}
+          </p>
         </div>
       </el-card>
 
-      <!-- 信息列表 -->
       <el-row :gutter="20" class="info-row">
         <el-col :span="24" :md="12">
-          <el-card class="info-card">
-            <div slot="header" class="card-title">
-              <el-icon><User /></el-icon> 基本信息
-            </div>
+          <el-card class="info-card" shadow="hover">
+            <template #header>
+              <div class="card-title">
+                <el-icon><User /></el-icon> 基本信息
+              </div>
+            </template>
             <el-form label-width="100px" class="info-form">
               <el-form-item label="用户ID">
-                <span>#{{ user.id }}</span>
+                <span class="text-mono">#{{ user.id }}</span>
               </el-form-item>
               <el-form-item label="用户名">
                 <span>{{ user.username }}</span>
               </el-form-item>
               <el-form-item label="真实姓名">
-                <span>{{ user.realName || '<span class="text-red-500">未设置</span>' }}</span>
+                <span v-if="user.realName">{{ user.realName }}</span>
+                <span v-else class="text-placeholder">未设置</span>
+              </el-form-item>
+              <el-form-item label="所在地">
+                <span v-if="user.location">{{ user.location }}</span>
+                <span v-else class="text-placeholder">未知地区</span>
               </el-form-item>
             </el-form>
           </el-card>
         </el-col>
 
         <el-col :span="24" :md="12">
-          <el-card class="info-card">
-            <div slot="header" class="card-title">
-              <el-icon><Message /></el-icon> 联系信息
-            </div>
+          <el-card class="info-card" shadow="hover">
+            <template #header>
+              <div class="card-title">
+                <el-icon><Message /></el-icon> 联系信息
+              </div>
+            </template>
             <el-form label-width="100px" class="info-form">
               <el-form-item label="邮箱">
-                <span>{{ user.email || '<span class="text-red-500">未设置</span>' }}</span>
+                <span v-if="user.email">{{ user.email }}</span>
+                <span v-else class="text-placeholder">未设置</span>
               </el-form-item>
               <el-form-item label="手机号">
-                <span>{{ user.phone || '<span class="text-red-500">未设置</span>' }}</span>
+                <span v-if="user.phone">{{ user.phone }}</span>
+                <span v-else class="text-placeholder">未设置</span>
+              </el-form-item>
+              <el-form-item label="最近登录IP">
+                <span class="text-mono">{{ user.ip || '未知' }}</span>
               </el-form-item>
             </el-form>
           </el-card>
         </el-col>
 
         <el-col :span="24">
-          <el-card class="info-card">
-            <div slot="header" class="card-title">
-              <el-icon><Document /></el-icon> 账户信息
-            </div>
-            <el-form label-width="120px" class="info-form" :model="user">
+          <el-card class="info-card" shadow="hover">
+            <template #header>
+              <div class="card-title">
+                <el-icon><Document /></el-icon> 账户状态
+              </div>
+            </template>
+            <el-form label-width="120px" class="info-form">
               <el-row :gutter="20">
                 <el-col :span="24" :md="12">
                   <el-form-item label="注册时间">
-                    <span>{{ formatDateTime(user.createTime) || '未知' }}</span>
+                    <span class="text-mono">{{ formatDateTime(user.createTime) }}</span>
                   </el-form-item>
                 </el-col>
                 <el-col :span="24" :md="12">
                   <el-form-item label="最后更新">
-                    <span>{{ formatDateTime(user.updateTime) || '未知' }}</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="24" :md="12">
-                  <el-form-item label="密码">
-                    <span>•••••••• <span class="text-gray-500 text-xs">(已隐藏)</span></span>
+                    <span class="text-mono">{{ formatDateTime(user.updateTime) }}</span>
                   </el-form-item>
                 </el-col>
                 <el-col :span="24" :md="12">
                   <el-form-item label="资料完整度">
-                    <!-- 进度条：根据完整度显示不同颜色，100%时显示成功色 -->
-                    <el-progress 
-                      :percentage="completion" 
-                      :status="getProgressStatus()"
-                      stroke-width="8"
-                      style="width: 180px; display: inline-block;"
-                    ></el-progress>
-                    <span class="ml-3 text-lg font-medium">{{ completion }}%</span>
-                    <!-- 未完善字段提示 -->
-                    <p class="mt-2 text-sm text-gray-500" v-if="incompleteFields.length > 0">
-                      未完善：{{ incompleteFields.join('、') }}
-                    </p>
+                    <div class="completion-box">
+                      <el-progress 
+                        :percentage="completion" 
+                        :status="getProgressStatus()"
+                        :stroke-width="10"
+                        style="width: 200px"
+                      ></el-progress>
+                      <span class="completion-text" v-if="incompleteFields.length > 0">
+                        还需完善：{{ incompleteFields.join('、') }}
+                      </span>
+                      <span class="completion-text success" v-else>
+                        完美！资料已全部填好 🎉
+                      </span>
+                    </div>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -139,28 +152,26 @@
       </el-row>
     </div>
 
-    <!-- 编辑弹窗 -->
     <el-dialog 
       v-model="showEditDialog" 
       title="编辑个人信息" 
       width="500px"
-      :close-on-click-modal="false"
+      destroy-on-close
     >
       <el-form 
         :model="form" 
         :rules="rules" 
         ref="formRef" 
-        label-width="100px"
-        class="edit-form"
+        label-width="80px"
       >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" readonly placeholder="用户名不可修改" />
+        <el-form-item label="用户名">
+          <el-input v-model="form.username" disabled />
         </el-form-item>
         <el-form-item label="真实姓名" prop="realName">
           <el-input v-model="form.realName" placeholder="请输入真实姓名" />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" type="email" placeholder="请输入邮箱" />
+          <el-input v-model="form.email" placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
           <el-input v-model="form.phone" placeholder="请输入手机号" />
@@ -170,27 +181,26 @@
             v-model="form.introduction" 
             type="textarea" 
             :rows="3" 
-            placeholder="请输入个性签名" 
-            maxlength="500"
+            placeholder="写一句话介绍自己..." 
+            maxlength="200"
+            show-word-limit
           />
         </el-form-item>
       </el-form>
-      
-      <div slot="footer">
+      <template #footer>
         <el-button @click="showEditDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitForm">保存</el-button>
-      </div>
+        <el-button type="primary" @click="submitForm" :loading="submitting">保存</el-button>
+      </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, toRefs, watch, computed } from 'vue';
-import { getAdmin, getAdminById, updateAdmin } from '@/api/admin';
-import { User, Edit, Refresh, Message, Document } from '@element-plus/icons-vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ref, reactive, onMounted, toRefs, computed } from 'vue';
+import { getAdminById, updateAdmin } from '@/api/admin';
+import { User, Edit, Refresh, Message, Document, Location, ChatDotRound } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
 
-// 状态管理
 const state = reactive({
   user: {
     id: null,
@@ -200,323 +210,225 @@ const state = reactive({
     phone: '',
     introduction: '',
     createTime: null,
-    updateTime: null
+    updateTime: null,
+    ip: '',       // ✨ 新增
+    location: ''  // ✨ 新增
   },
-  form: {
-    id: null,
-    username: '',
-    realName: '',
-    email: '',
-    phone: '',
-    introduction: ''
-  },
+  form: {},
   loading: true,
-  error: null,
-  showEditDialog: false,
-  formChanged: false
+  submitting: false,
+  showEditDialog: false
 });
 
-const { user, form, loading, error, showEditDialog, formChanged } = toRefs(state);
-
-// 表单验证规则
-const rules = ref({
-  username: [
-    { required: true, message: '用户名不能为空', trigger: 'blur' }
-  ],
-  email: [
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
-  ],
-  phone: [
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式', trigger: 'blur' }
-  ]
-});
-
-// 表单引用
+const { user, form, loading, submitting, showEditDialog } = toRefs(state);
 const formRef = ref(null);
 
-// 1. 计算资料完整度（总分100%，5个字段各20%）
+const rules = {
+  email: [{ type: 'email', message: '邮箱格式不正确', trigger: 'blur' }],
+  phone: [{ pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }]
+};
+
+// 计算完整度
 const completion = computed(() => {
-  let score = 0;
-  // 统计所有需要完善的字段（共5个，每个20分）
-  const fields = [
-    { key: 'username', required: true }, // 用户名（必选，默认有值）
-    { key: 'realName', required: false },
-    { key: 'email', required: false },
-    { key: 'phone', required: false },
-    { key: 'introduction', required: false }
-  ];
-
-  // 计算得分
-  fields.forEach(field => {
-    // 用户名默认有值，直接得分；其他字段有值则得分
-    if (field.required || (user.value[field.key] && user.value[field.key].trim() !== '')) {
-      score += 20;
-    }
-  });
-
-  return score; // 范围：0-100，所有字段填完时正好100%
+  const fields = ['realName', 'email', 'phone', 'introduction'];
+  const filled = fields.filter(k => state.user[k] && state.user[k].trim()).length;
+  // 基础分20(用户名) + 每个字段20分
+  return 20 + filled * 20;
 });
 
-// 2. 未完善字段列表（提示用户需要补什么）
 const incompleteFields = computed(() => {
-  const fieldsMap = {
-    realName: '真实姓名',
-    email: '邮箱',
-    phone: '手机号',
-    introduction: '个性签名'
-  };
-  const incomplete = [];
-
-  // 遍历字段，收集未完善的
-  Object.entries(fieldsMap).forEach(([key, label]) => {
-    if (!user.value[key] || user.value[key].trim() === '') {
-      incomplete.push(label);
-    }
-  });
-
-  return incomplete;
+  const map = { realName: '姓名', email: '邮箱', phone: '手机', introduction: '签名' };
+  return Object.keys(map).filter(k => !state.user[k] || !state.user[k].trim()).map(k => map[k]);
 });
 
-// 3. 进度条状态（根据完整度显示不同颜色）
 const getProgressStatus = () => {
-  if (completion.value === 100) return 'success'; // 100% 绿色
-  if (completion.value >= 60) return 'warning';  // 60%-99% 黄色
-  return 'info';                                 // <60% 蓝色
+  if (completion.value === 100) return 'success';
+  if (completion.value >= 60) return 'warning';
+  return 'exception';
 };
 
-// 格式化日期时间
-const formatDateTime = (dateTime) => {
-  if (!dateTime) return '';
-  
-  try {
-    const date = new Date(dateTime);
-    return date.toLocaleString('zh-CN');
-  } catch (e) {
-    return dateTime;
-  }
+const formatDateTime = (time) => {
+  if (!time) return '暂无数据';
+  return time.replace('T', ' ');
 };
 
-// 获取用户信息
 const fetchUserInfo = async () => {
   state.loading = true;
-  state.error = null;
-
-  //从本地存储中获取用户信息
-  const adminInfo = JSON.parse(localStorage.getItem('adminInfo'));
-  const id = adminInfo.id;
-  
   try {
-    const response = await getAdminById(id);
-    if (response.code) {
-      state.user = { ...response.data };
-    } else {
-      state.error = response.message || '获取信息失败';
+    const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+    if (!adminInfo.id) throw new Error('未登录');
+
+    const res = await getAdminById(adminInfo.id);
+    if (res.code === 1) {
+      state.user = { ...res.data };
+      
+      // 🚨 如果后端还没返回 ip/location，这里为了演示效果先模拟一下
+      // 等后端接口更新后，删除下面两行即可
+      if (!state.user.ip) state.user.ip = '127.0.0.1'; 
+      if (!state.user.location) state.user.location = '未知'; 
     }
   } catch (err) {
-    state.error = '网络错误：' + (err.message || '无法连接服务器');
+    ElMessage.error(err.message || '获取信息失败');
   } finally {
     state.loading = false;
   }
 };
 
-// 提交表单
 const submitForm = async () => {
   if (!formRef.value) return;
-  
-  try {
-    await formRef.value.validate();
-    
-    const response = await updateAdmin(state.form);
-    if (response.code) {
-      ElMessage.success('信息更新成功');
-      state.user = { ...state.form };
-      state.showEditDialog = false;
-      state.formChanged = false;
-    } else {
-      ElMessage.error(response.message || '更新失败');
+  await formRef.value.validate(async (valid) => {
+    if (valid) {
+      state.submitting = true;
+      try {
+        const res = await updateAdmin(state.form);
+        if (res.code === 1) {
+          ElMessage.success('保存成功');
+          state.showEditDialog = false;
+          fetchUserInfo(); // 刷新数据
+        } else {
+          ElMessage.error(res.msg || '保存失败');
+        }
+      } catch (e) {
+        ElMessage.error('网络异常');
+      } finally {
+        state.submitting = false;
+      }
     }
-  } catch (err) {
-    ElMessage.error('请检查输入内容是否正确');
-  }
+  });
 };
 
-// 监听表单变化
-watch(form, (newVal, oldVal) => {
-  if (oldVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
-    state.formChanged = true;
-  }
-}, { deep: true });
-
-// 监听编辑弹窗显示
-watch(showEditDialog, (value) => {
-  if (value) {
+// 打开弹窗时初始化表单
+import { watch } from 'vue';
+watch(showEditDialog, (val) => {
+  if (val) {
     state.form = { ...state.user };
-    state.formChanged = false;
   }
 });
 
-// 初始化
-onMounted(() => {
-  fetchUserInfo();
-});
+onMounted(fetchUserInfo);
 </script>
 
 <style scoped>
-/* 基础样式不变，新增以下样式 */
-/* 未设置字段的红色提示 */
-.text-red-500 {
-  color: #f56c6c;
-}
-
-/* 进度条旁的提示文字 */
-.info-form .el-form-item:last-child p {
-  margin-bottom: 0;
-}
-
-/* 确保富文本格式生效 */
-.info-form span {
-  white-space: normal;
-}
-
-/* 其他原有样式保持不变... */
 .page-container {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
+  animation: fade-in 0.5s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
+.page-header h1 { margin: 0; font-size: 22px; color: #303133; }
 
-.page-header h1 {
-  font-size: 20px;
-  margin: 0;
-}
-
-.refresh-btn {
-  display: flex;
-  align-items: center;
-}
-
-.error-alert {
-  margin-bottom: 20px;
-}
-
-.content-wrapper {
-  animation: fadeIn 0.5s;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* 资料卡片 */
 .profile-card {
-  margin-bottom: 20px;
-  border-radius: 8px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: none;
+  background: linear-gradient(to right bottom, #ffffff, #fcfcfc);
 }
 
 .profile-header {
   display: flex;
   align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #eee;
+  gap: 24px;
+  padding: 10px 0;
+}
+
+.avatar-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
-  background-color: #f0f2f5;
+  background: #ecf5ff;
+  color: #409eff;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 20px;
+  font-size: 40px;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.15);
+  border: 4px solid #fff;
 }
 
-.avatar-icon {
-  font-size: 40px;
-  color: #409eff;
+.ip-tag {
+  transform: scale(0.9);
+}
+
+.user-info {
+  flex: 1;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
 .user-info h2 {
-  margin: 0 0 5px 0;
+  margin: 0;
   font-size: 20px;
+  color: #303133;
+}
+
+.location-badge {
+  border-radius: 10px;
 }
 
 .user-info p {
   margin: 0;
-  color: #666;
-}
-
-.profile-header .el-button {
-  margin-left: auto;
+  color: #909399;
+  font-size: 14px;
 }
 
 .signature {
-  padding: 20px;
-  color: #666;
-  border-left: 3px solid #409eff;
-  margin: 10px 20px;
-  background-color: #f5f7fa;
-}
-
-.info-row {
-  margin-bottom: 20px;
-}
-
-.info-card {
-  margin-bottom: 20px;
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: #f4f4f5;
   border-radius: 8px;
-}
-
-.card-title {
+  color: #606266;
+  font-size: 14px;
   display: flex;
   align-items: center;
-  font-weight: 500;
 }
+.signature p { margin: 0; display: flex; align-items: center; gap: 8px; }
 
-.card-title el-icon {
-  margin-right: 5px;
-}
+/* 信息卡片通用 */
+.info-row { margin-bottom: 20px; }
+.info-card { border-radius: 8px; height: 100%; border: none; }
+.card-title { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #303133; }
 
-.info-form {
-  margin-top: 10px;
-}
+.info-form .el-form-item { margin-bottom: 12px; }
+.text-placeholder { color: #c0c4cc; font-size: 13px; font-style: italic; }
+.text-mono { font-family: Monaco, Consolas, monospace; color: #606266; }
 
-.info-form .el-form-item {
-  margin-bottom: 15px;
+/* 进度条区域 */
+.completion-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-
-.edit-form {
-  margin-top: 15px;
-}
+.completion-text { font-size: 12px; color: #909399; }
+.completion-text.success { color: #67c23a; }
 
 @media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .profile-header {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .avatar {
-    margin-right: 0;
-    margin-bottom: 15px;
-  }
-  
-  .profile-header .el-button {
-    margin-left: 0;
-    margin-top: 15px;
-    width: 100%;
-  }
+  .profile-header { flex-direction: column; text-align: center; }
+  .name-row { justify-content: center; }
+  .profile-header .el-button { width: 100%; margin-top: 10px; }
 }
 </style>
