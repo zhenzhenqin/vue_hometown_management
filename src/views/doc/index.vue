@@ -5,7 +5,7 @@
         <el-icon class="brand-icon"><Reading /></el-icon>
         <div class="brand-text">
           <span class="title">HOMETOWN</span>
-          <span class="version">v1.0.6 Stable</span>
+          <span class="version">v1.0.7 Stable</span>
         </div>
       </div>
       <nav class="toc-wrapper">
@@ -52,12 +52,12 @@ import hljs from 'highlight.js'
 // 选用更温和的代码配色方案
 import 'highlight.js/styles/atom-one-dark-reasonable.css'
 
-// --- 📝 项目核心文档 (内容完全保留，严禁减少) ---
+// --- 📝 项目核心文档 (v1.0.7 Stable) ---
 const markdownContent = `
 # 衢州地区信息管理系统 (Hometown Management System)
 
-> **版本**: v1.0.6 (Stable Build)
-> **开发者**: mjc (23H034160336)  
+> **版本**: v1.0.7 (Stable Build)
+> **开发者**: mjc (23H034160336)  
 > **状态**: 🟢 已部署 (Stable)
 
 ---
@@ -66,30 +66,31 @@ const markdownContent = `
 
 本项目是一个致力于**弘扬衢州文化、推广地方特色**的全栈信息管理平台。系统集成了**文化遗产展示、特产推广、旅游景点导航**以及**后台数据可视化管理**等功能。
 
-**v1.0.6 核心升级**：在 v1.0.5 的基础上，实现了**生产环境与配置文件的物理分离**，实装了 **Nginx 真实 IP 透传**与 **OSS 流量防盗链**，极大提升了公网环境下的安全性。
+**v1.0.7 核心升级**：在 v1.0.6 的基础上，本项目迎来了“理性数据”与“感性文化”的双重进化。新增 **“烂柯·岁月棋局”** 运行中枢，以南孔文化隐喻系统状态；同时上线 **“数据中心”** 模块，实装了 **UV/PV 流量统计**与**地域感知雷达**，实现了从“被动记录”到“主动分析”的跨越。
 
 ---
 
 ## 2. 技术栈 (Tech Stack)
 
 ### 🛠️ 后端 (Backend)
--   **核心框架**: Spring Boot 2.7.x
--   **ORM**: MyBatis / MyBatis-Plus
--   **数据库**: MySQL 8.0
--   **IP解析**: **Ip2Region (离线 IP 库，毫秒级查询)** [NEW]
--   **缓存**: Redis (用于会话管理与热点数据缓存)
--   **安全**: JWT (JSON Web Token) 鉴权
--   **监控**: OSHI (System Hardware Information) 
--   **工具**: Swagger/Knife4j, Lombok, FastJSON
--   **云服务**: 阿里云 OSS (对象存储)
+-   **核心框架**: Spring Boot 2.7.x
+-   **ORM**: MyBatis / MyBatis-Plus
+-   **数据库**: MySQL 8.0
+-   **IP解析**: **Ip2Region (离线 IP 库，毫秒级查询)**
+-   **缓存**: **Redis** (用于会话管理、**UV/PV 统计**与热点数据缓存)
+-   **安全**: JWT (JSON Web Token) 鉴权
+-   **监控**: OSHI (System Hardware Information) 
+-   **工具**: Swagger/Knife4j, Lombok, FastJSON
+-   **云服务**: 阿里云 OSS (对象存储)
 
 ### 💻 前端 (Frontend)
--   **框架**: Vue 3 (Composition API)
--   **构建**: Vite 4.x
--   **UI 组件库**: Element Plus (表格自适应优化)
--   **图表**: ECharts 5.x (数据大屏)
--   **地图**: 百度地图 JavaScript API GL
--   **HTTP**: Axios
+-   **框架**: Vue 3 (Composition API)
+-   **构建**: Vite 4.x
+-   **UI 组件库**: Element Plus (表格自适应优化)
+-   **创意交互**: **Pure CSS Animation** (无图水墨渲染技术) [NEW]
+-   **图表**: **ECharts 5.x** (深度集成地图与雷达图)
+-   **地图**: 百度地图 JavaScript API GL + ECharts GeoJson
+-   **HTTP**: Axios
 
 ---
 
@@ -97,135 +98,88 @@ const markdownContent = `
 
 \`\`\`mermaid
 graph TD
-    User[用户/管理员] -->|登录/操作| Gateway[Nginx / 反向代理]
-    Gateway --> Server(Spring Boot 后端)
-    
-    subgraph "核心服务层"
-    Server -->|解析IP| Ip2Region[IP 属地库]
-    Server -->|读写| DB[(MySQL 数据库)]
-    Server -->|缓存| Cache[(Redis)]
-    Server -->|监控| Hardware[OSHI 硬件监控]
-    end
-    
-    subgraph "生产安全层"
-    Git[Git 仓库] --x|忽略| Sensitive[.yml 配置文件]
-    Config[外部 application-prod.yml] --挂载启动--> Server
-    end
+    User[用户/管理员] -->|登录/操作| Gateway[Nginx / 反向代理]
+    Gateway --> Server(Spring Boot 后端)
+    
+    subgraph "核心服务层"
+    Server -->|解析IP| Ip2Region[IP 属地库]
+    Server -->|读写| DB[(MySQL 数据库)]
+    Server -->|缓存| Cache[(Redis)]
+    Server -->|监控| Hardware[OSHI 硬件监控]
+    end
+    
+    subgraph "数据与创意层"
+    Cache -->|UV/PV| ReportService[报表服务]
+    Hardware -->|系统状态| LankeView[烂柯棋局可视化]
+    end
+
+    subgraph "生产安全层"
+    Git[Git 仓库] --x|忽略| Sensitive[.yml 配置文件]
+    Config[外部 application-prod.yml] --挂载启动--> Server
+    end
 \`\`\`
 
 ---
 
 ## 4. 核心功能模块 (Modules)
 
-### 👮 安全与审计 (Security & Audit) **[NEW]**
--   **IP 属地监控**: 自动获取用户客户端 IP，通过 Nginx 透传 X-Real-IP，离线解析出“省份·城市”，并记录在数据库中。
--   **登录追踪**: 管理员和用户登录/注册时，自动更新最后登录 IP 和地点。
--   **配置安全隔离**: 生产环境密钥（DB/OSS）脱离 Jar 包，采用外部挂载模式，防止代码泄露导致 AK/SK 风险。
+### 📊 数据中心 (Data Center) **[NEW]**
+-   **流量分析 (Traffic Analysis)**: 
+    -   **PV (Page View)**: 基于 Redis 的原子计数器，实时统计页面访问量。
+    -   **UV (Unique Visitor)**: 基于 Redis \`Set\` 结构去重，精确统计每日独立访客数。
+-   **地域感知 (Region Radar)**:
+    -   **分布地图**: 结合 ECharts 地图组件，直观展示用户来源省份与城市。
+    -   **Top 榜单**: 自动计算并展示用户量 Top 10 的活跃城市。
+
+### 🎨 创意交互 (Creative Interaction) **[NEW]**
+-   **烂柯 · 岁月棋局**: 
+    -   **设计理念**: 结合衢州“烂柯山”传说，以棋喻时。
+    -   **动态对弈**: 前端算法模拟围棋自动落子，每一手棋代表系统稳定运行的一个心跳。
+    -   **数据隐喻**: 
+        -   *运行时长* -> *棋局进程*。
+        -   *CPU 负载* -> *云雾浓度* (纯 CSS 粒子雾气，负载越高雾气越浓)。
+
+### 👮 安全与审计 (Security & Audit)
+-   **IP 属地监控**: 自动获取用户客户端 IP，通过 Nginx 透传 X-Real-IP，离线解析出“省份·城市”，并记录在数据库中。
+-   **登录追踪**: 管理员和用户登录/注册时，自动更新最后登录 IP 和地点。
+-   **配置安全隔离**: 生产环境密钥（DB/OSS）脱离 Jar 包，采用外部挂载模式，防止代码泄露导致 AK/SK 风险。
 
 ### 🗺️ 分布地图 (Attraction Map)
--   **全域导览**: 集成百度地图 GL，直观展示衢州所有景点的地理分布。
--   **智能定位**: 支持数据库经纬度直接打点，同时也支持基于地址的自动解析兜底方案。
--   **沉浸体验**: 3D 倾斜视角 + 飞行跳转动画 (FlyTo)。
+-   **全域导览**: 集成百度地图 GL，直观展示衢州所有景点的地理分布。
+-   **智能定位**: 支持数据库经纬度直接打点，同时也支持基于地址的自动解析兜底方案。
+-   **沉浸体验**: 3D 倾斜视角 + 飞行跳转动画 (FlyTo)。
 
 ### 🖥️ 服务监控 (Server Monitor)
--   **实时仪表盘**: 实时监控服务器的 CPU 使用率、内存占用率。
--   **环境信息**: 展示服务器操作系统、IP 地址、Java 版本、项目路径等。
+-   **实时仪表盘**: 实时监控服务器的 CPU 使用率、内存占用率。
+-   **环境信息**: 展示服务器操作系统、IP 地址、Java 版本、项目路径等。
 
 ### 🏛️ 文化与特产 (Culture & Food)
--   **非遗展示**: 收录衢州各类非物质文化遗产，支持富文本展示。
--   **特产美食**: 三头一掌、烤饼等特色美食介绍。
+-   **非遗展示**: 收录衢州各类非物质文化遗产，支持富文本展示。
+-   **特产美食**: 三头一掌、烤饼等特色美食介绍。
 
 ---
 
-## 5. 核心代码片段 (Code Snippets)
+## 5. 部署指南 (Deployment)
 
-### 🌍 1. IP 属地智能解析 (Java) **[NEW]**
-\`\`\`java
-/**
- * 根据 IP 解析城市信息
- * 输入: 110.19.106.1 -> 输出: 浙江·宁波
- */
-public static String getCityInfo(String ip) {
-    try {
-        // 1. 查询 IP 库 (格式: 国家|区域|省份|城市|ISP)
-        String region = searcher.search(ip);
-        String[] parts = region.split("\\\\|"); // 转义管道符
-        
-        // 2. 提取并简化
-        String province = parts[2];
-        String city = parts[3];
-        
-        // 3. 智能拼接
-        return simplifyArea(province) + "·" + simplifyArea(city);
-    } catch (Exception e) {
-        return "未知";
-    }
-}
-\`\`\`
-
-### 🔧 2. MyBatis 动态更新修复 (XML) **[NEW]**
-\`\`\`xml
-<update id="updateIpAndCity">
-    update user
-    <set>
-        <if test="ip != null">ip = #{ip},</if>
-        <if test="city != null">city = #{city},</if>
-        update_time = now(), </set>
-    where id = #{id}
-</update>
-\`\`\`
-
-### 📡 3. OSHI 获取系统信息 (Java)
-\`\`\`java
-public void copyTo() throws Exception {
-    SystemInfo si = new SystemInfo();
-    HardwareAbstractionLayer hal = si.getHardware();
-    setCpuInfo(hal.getProcessor());
-    setMemInfo(hal.getMemory());
-    setSysInfo();
-}
-\`\`\`
-
-### 🗺️ 4. 百度地图智能打点 (JavaScript)
-\`\`\`javascript
-const addCreativeMarker = (item) => {
-  // 🟢 优先使用数据库经纬度 (高性能)
-  if (item.longitude && item.latitude) {
-    const point = new BMapGL.Point(item.longitude, item.latitude)
-    createMarkerLogic(point, item)
-  } else {
-    // 🟡 兜底：使用地址解析
-    const myGeo = new BMapGL.Geocoder()
-    myGeo.getPoint('衢州市 ' + item.name, (p) => {
-      if (p) createMarkerLogic(p, item)
-    }, '衢州市')
-  }
-}
-\`\`\`
-
----
-
-## 6. 部署指南 (Deployment) **[NEW & UPDATED]**
-
-### 🖥️ 6.1 运行配置详解 (Runtime Specification)
+### 🖥️ 5.1 运行配置详解 (Runtime Specification)
 - **云服务**: 阿里云香港节点 (47.76.150.187)
 - **操作系统**: CentOS 7.9 (内核 3.10)
 - **JVM 环境**: OpenJDK 17 (G1 GC 优化)
-  - *启动参数参考*: -Xms512m -Xmx1024m -Dfile.encoding=UTF-8
+  - *启动参数参考*: -Xms512m -Xmx1024m -Dfile.encoding=UTF-8
 - **MySQL 8.0**: 
-  - *配置*: 字符集 utf8mb4, 开启慢查询日志。
-  - *连接*: 仅限 localhost (127.0.0.1) 访问，禁止外网连接以保安全。
+  - *配置*: 字符集 utf8mb4, 开启慢查询日志。
+  - *连接*: 仅限 localhost (127.0.0.1) 访问，禁止外网连接以保安全。
 - **Redis 7.0**: 
-  - *存储*: 默认 16 库，项目使用 DB6。
-  - *持久化*: AOF 每秒同步一次，保障数据一致性。
+  - *存储*: 默认 16 库，项目使用 DB6。
+  - *持久化*: AOF 每秒同步一次，保障数据一致性。
 - **Nginx 1.22**: 
-  - *优化*: 开启 Gzip 压缩，配置 client_max_body_size 10m。
+  - *优化*: 开启 Gzip 压缩，配置 client_max_body_size 10m。
 - **目录结构**:
-  - \`/www/wwwroot/qu-server-0.0.1-SNAPSHOT.jar\` (后端包)
-  - \`/www/wwwroot/application-prod.yml\` (外部私密配置)
-  - \`/www/wwwroot/manage/\` (管理端静态资源)
+  - \`/www/wwwroot/qu-server-0.0.1-SNAPSHOT.jar\` (后端包)
+  - \`/www/wwwroot/application-prod.yml\` (外部私密配置)
+  - \`/www/wwwroot/manage/\` (管理端静态资源)
 
-### 6.2 生产环境启动 (External Config)
+### 5.2 生产环境启动 (External Config)
 使用 \`additional-location\` 参数挂载外部配置文件启动，实现“密钥不上云”：
 
 \`\`\`bash
@@ -235,43 +189,48 @@ nohup java -jar /www/wwwroot/qu-server-0.0.1-SNAPSHOT.jar \\
 > /www/wwwroot/log.txt 2>&1 &
 \`\`\`
 
-### 6.3 Nginx 高级配置 (Real IP & Upload)
+### 5.3 Nginx 高级配置 (Real IP & Upload)
 针对 8081 管理端端口，实装 IP 转发及上传限制：
 
 \`\`\`nginx
 location /api/ {
-    proxy_pass http://127.0.0.1:8080/;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr; # 获取真实用户IP
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    client_max_body_size 10m; # 放行大图上传
+    proxy_pass http://127.0.0.1:8080/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr; # 获取真实用户IP
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    client_max_body_size 10m; # 放行大图上传
 }
 \`\`\`
 
-### 6.4 阿里云 OSS 防盗链
+### 5.4 阿里云 OSS 防盗链
 - **策略**: 开启 Referer 白名单。
 - **配置**: 仅允许 \`47.76.150.187\` 发起的请求，有效防止恶意盗刷 OSS 下行流量。
 
 ---
 
-## 7. 更新日志 (Changelog)
+## 6. 更新日志 (Changelog)
 
--   **v1.0.6 (2025-12-28)**:
-    -   ✨ **[Deploy]** 完成从本地打包向**服务器外部配置挂载**的架构转型。
-    -   🔒 **[Security]** 实装 **OSS Referer 防盗链**，大幅降低流量被盗风险。
-    -   🌐 **[Network]** 优化 Nginx 转发 Header，解决 \`Ip2Region\` 离线库无法识别代理后真实 IP 的问题。
-    -   🐛 **[Bugfix]** 修复了外部 YAML 文件中 Redis 配置缩进及阿里云驼峰命名不匹配导致的启动失败。
+-   **v1.0.7 (2025-12-30)**:
+    -   ✨ **[Creative]** 新增 **“烂柯·岁月棋局”** 运行中枢，采用纯 CSS 构建水墨山水背景与自动对弈围棋，以艺术化的方式展示系统状态。
+    -   ✨ **[Data]** 新增 **“数据中心”** 模块，实装基于 Redis 的 **UV (独立访客) / PV (访问量)** 统计功能。
+    -   ✨ **[Visual]** 新增 **“地域感知雷达”**，通过 ECharts 实现用户来源地的可视化分布。
 
--   **v1.0.5 (2025-12-28)**: 
-    -   ✨ **[Feature]** 全面实装 **IP 属地监控** 功能。
-    -   🐛 **[Bugfix]** 修复了 MyBatis \`update\` 语句语法错误。
-    -   🔒 **[Security]** 修复了阿里云 AK 泄露风险，重构了 \`.gitignore\`。
+-   **v1.0.6 (2025-12-28)**:
+    -   ✨ **[Deploy]** 完成从本地打包向**服务器外部配置挂载**的架构转型。
+    -   🔒 **[Security]** 实装 **OSS Referer 防盗链**，大幅降低流量被盗风险。
+    -   🌐 **[Network]** 优化 Nginx 转发 Header，解决 \`Ip2Region\` 离线库无法识别代理后真实 IP 的问题。
+    -   🐛 **[Bugfix]** 修复了外部 YAML 文件中 Redis 配置缩进及阿里云驼峰命名不匹配导致的启动失败。
 
--   **v1.0.4 (2025-12-19)**:
-    -   ✨ **[Feature]** 新增 **“分布地图”** 模块与 **“服务监控”** 模块。
+-   **v1.0.5 (2025-12-28)**: 
+    -   ✨ **[Feature]** 全面实装 **IP 属地监控** 功能。
+    -   🐛 **[Bugfix]** 修复了 MyBatis \`update\` 语句语法错误。
+    -   🔒 **[Security]** 修复了阿里云 AK 泄露风险，重构了 \`.gitignore\`。
 
--   **v1.0.0 (2025-09-15)**: 
-    -   🎉 项目初始化。
+-   **v1.0.4 (2025-12-19)**:
+    -   ✨ **[Feature]** 新增 **“分布地图”** 模块与 **“服务监控”** 模块。
+
+-   **v1.0.0 (2025-09-15)**: 
+    -   🎉 项目初始化。
 
 ---
 
