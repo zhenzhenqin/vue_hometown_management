@@ -33,8 +33,8 @@
           <div class="user-info">
             <div class="name-row">
               <h2>{{ user.realName || user.username }}</h2>
-              <el-tag v-if="user.location" type="success" size="small" effect="plain" class="location-badge">
-                <el-icon><Location /></el-icon> {{ user.location }}
+              <el-tag v-if="user.city" type="success" size="small" effect="plain" class="location-badge">
+                <el-icon><Location /></el-icon> {{ user.city }}
               </el-tag>
             </div>
             <p>@{{ user.username }}</p>
@@ -78,7 +78,7 @@
                 <span v-else class="text-placeholder">未设置</span>
               </el-form-item>
               <el-form-item label="所在地">
-                <span v-if="user.location">{{ user.location }}</span>
+                <span v-if="user.city">{{ user.city }}</span>
                 <span v-else class="text-placeholder">未知地区</span>
               </el-form-item>
             </el-form>
@@ -196,7 +196,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, toRefs, computed } from 'vue';
+import { ref, reactive, onMounted, toRefs, computed, watch } from 'vue';
 import { getAdminById, updateAdmin } from '@/api/admin';
 import { User, Edit, Refresh, Message, Document, Location, ChatDotRound } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
@@ -211,8 +211,8 @@ const state = reactive({
     introduction: '',
     createTime: null,
     updateTime: null,
-    ip: '',       // ✨ 新增
-    location: ''  // ✨ 新增
+    ip: '', 
+    city: ''  // ✨ 修改点3：state中 location 改为 city
   },
   form: {},
   loading: true,
@@ -231,8 +231,8 @@ const rules = {
 // 计算完整度
 const completion = computed(() => {
   const fields = ['realName', 'email', 'phone', 'introduction'];
+  // 注意：后端返回 email 为空字符串 ""，trim() 是安全的
   const filled = fields.filter(k => state.user[k] && state.user[k].trim()).length;
-  // 基础分20(用户名) + 每个字段20分
   return 20 + filled * 20;
 });
 
@@ -260,12 +260,9 @@ const fetchUserInfo = async () => {
 
     const res = await getAdminById(adminInfo.id);
     if (res.code === 1) {
+      // ✨ 修改点4：直接解构赋值，因为 res.data 里包含了 city 和 ip
+      // 且删除了之前的模拟数据代码
       state.user = { ...res.data };
-      
-      // 🚨 如果后端还没返回 ip/location，这里为了演示效果先模拟一下
-      // 等后端接口更新后，删除下面两行即可
-      if (!state.user.ip) state.user.ip = '127.0.0.1'; 
-      if (!state.user.location) state.user.location = '未知'; 
     }
   } catch (err) {
     ElMessage.error(err.message || '获取信息失败');
@@ -297,8 +294,6 @@ const submitForm = async () => {
   });
 };
 
-// 打开弹窗时初始化表单
-import { watch } from 'vue';
 watch(showEditDialog, (val) => {
   if (val) {
     state.form = { ...state.user };
@@ -309,6 +304,7 @@ onMounted(fetchUserInfo);
 </script>
 
 <style scoped>
+/* 样式部分保持完全不变 */
 .page-container {
   padding: 20px;
   max-width: 1000px;

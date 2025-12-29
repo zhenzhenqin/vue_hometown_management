@@ -5,10 +5,10 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import {
   Promotion, User, Menu, Document, Chicken, LocationFilled,
   CaretBottom, SwitchButton, Lock, UserFilled, Setting,
-  School, DataLine, Notebook, Odometer, 
-  Cpu 
+  School, DataLine, Notebook, Odometer, MapLocation, // 补充了 MapLocation 图标
+  Cpu, Reading, PieChart, TrendCharts
 } from '@element-plus/icons-vue'
-import { updatePassword } from '@/api/admin' 
+import { updatePassword } from '@/api/admin'
 
 const router = useRouter()
 
@@ -61,10 +61,7 @@ const passDialogVisible = ref(false)
 const passFormRef = ref(null)
 const passForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' })
 
-//获取用户id
-const admin = JSON.parse(localStorage.getItem('adminInfo'))
-adminId.value = admin.id
-
+// 密码校验逻辑
 const validatePass2 = (rule, value, callback) => {
   if (value === '') callback(new Error('请再次输入密码'))
   else if (value !== passForm.value.newPassword) callback(new Error('两次输入密码不一致!'))
@@ -87,7 +84,7 @@ const submitPassword = () => {
     if (valid) {
       try {
         const res = await updatePassword({
-          adminId: adminId.value, 
+          adminId: adminId.value,
           oldPassword: passForm.value.oldPassword,
           newPassword: passForm.value.newPassword
         })
@@ -163,8 +160,16 @@ const submitPassword = () => {
             </el-sub-menu>
 
             <el-sub-menu index="/report">
-              <template #title><el-icon><DataLine /></el-icon><span>数据统计</span></template>
-              <el-menu-item index="/report/dashboard"><el-icon><Odometer /></el-icon>数据概览</el-menu-item>
+              <template #title><el-icon><PieChart /></el-icon><span>数据中心</span></template>
+              <el-menu-item index="/report/dashboard">
+                <el-icon><Odometer /></el-icon>
+                <span>数据概览</span>
+              </el-menu-item>
+
+              <el-menu-item index="/reportUser">
+                <el-icon><TrendCharts /></el-icon>
+                <span>流量分析(UV/PV)</span>
+              </el-menu-item>
             </el-sub-menu>
 
             <el-menu-item index="/monitor">
@@ -222,7 +227,7 @@ const submitPassword = () => {
 </template>
 
 <style scoped>
-/* 原有样式保持不变，略作精简 */
+/* 原有样式保持不变 */
 .header {
   background-image: linear-gradient(to right, #1a5e38, #3aad6e);
   padding: 0 20px;

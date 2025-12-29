@@ -41,3 +41,11 @@ export const getSpecialtyPriceDistribution = () => {
         method: 'get'
     })
 }
+
+// 获取最近7天访问数据
+export const getVisitStats = () => {
+  return request({
+    url: '/dailyVisit/stats',
+    method: 'get'
+  })
+}
