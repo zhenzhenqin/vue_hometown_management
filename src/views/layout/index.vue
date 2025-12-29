@@ -5,8 +5,8 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import {
   Promotion, User, Menu, Document, Chicken, LocationFilled,
   CaretBottom, SwitchButton, Lock, UserFilled, Setting,
-  School, DataLine, Notebook, Odometer, MapLocation, // 补充了 MapLocation 图标
-  Cpu, Reading, PieChart, TrendCharts
+  School, DataLine, Notebook, Odometer, MapLocation, 
+  Cpu, Reading, PieChart, TrendCharts, LocationInformation
 } from '@element-plus/icons-vue'
 import { updatePassword } from '@/api/admin'
 
@@ -167,8 +167,12 @@ const submitPassword = () => {
               </el-menu-item>
 
               <el-menu-item index="/reportUser">
-                <el-icon><TrendCharts /></el-icon>
-                <span>流量分析(UV/PV)</span>
+                <el-icon><TrendCharts /></el-icon>流量分析
+              </el-menu-item>
+
+              <el-menu-item index="/region">
+                <el-icon><LocationInformation /></el-icon>
+                <span>地域感知雷达</span>
               </el-menu-item>
             </el-sub-menu>
 

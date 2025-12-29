@@ -17,6 +17,7 @@ import DocView from '@/views/doc/index.vue'
 import MonitorView from '@/views/monitor/index.vue'
 import MapView from '@/views/map/index.vue'
 import ReportUserView from '@/views/reportUser/index.vue'
+import RegionView from '@/views/region/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -116,6 +117,12 @@ const router = createRouter({
           name: 'reportUser',
           component: ReportUserView,
           meta: { title: '用户uv,pv报表' }
+        },
+        {
+          path: '/region',
+          name: 'region',
+          component: RegionView,
+          meta: { title: '地域感知雷达' }
         }
       ]
     }

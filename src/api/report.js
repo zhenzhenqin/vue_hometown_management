@@ -42,10 +42,18 @@ export const getSpecialtyPriceDistribution = () => {
     })
 }
 
-// 获取最近7天访问数据
+// 6.获取最近7天访问数据
 export const getVisitStats = () => {
   return request({
     url: '/dailyVisit/stats',
+    method: 'get'
+  })
+}
+
+// 7. 获取用户地域分布 
+export const getUserRegionStats = () => {
+  return request({
+    url: `${BASE_URL}/userRegion`,
     method: 'get'
   })
 }
