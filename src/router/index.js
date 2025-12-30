@@ -42,7 +42,7 @@ const router = createRouter({
         {
           path: '/website',
           name: 'website',
-          component: () => import('@/views/website/index.vue'),
+          component: WebsiteView,
           meta: { title: '烂柯岁月' }
         },
         {
@@ -131,6 +131,24 @@ const router = createRouter({
           name: 'region',
           component: RegionView,
           meta: { title: '地域感知雷达' }
+        },
+        {
+          path: '/article/list',
+          name: 'ArticleList',
+          component: () => import('@/views/article/list.vue'),
+          meta: { title: '碎碎念管理', icon: 'Notebook' } 
+        },
+        {
+          path: '/article/publish',
+          name: 'ArticlePublish',
+          component: () => import('@/views/article/publish.vue'),
+          meta: { title: '写点什么', icon: 'EditPen' }
+        },
+        {
+          path: '/article/edit/:id', 
+          name: 'ArticleEdit',
+          component: () => import('@/views/article/publish.vue'),
+          meta: { title: '修改文章', hidden: true } 
         }
       ]
     }

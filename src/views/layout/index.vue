@@ -6,7 +6,8 @@ import {
   Promotion, User, Menu, Document, Chicken, LocationFilled,
   CaretBottom, SwitchButton, Lock, UserFilled, Setting,
   School, DataLine, Notebook, Odometer, MapLocation,
-  Cpu, Reading, PieChart, TrendCharts, LocationInformation
+  Cpu, Reading, PieChart, TrendCharts, LocationInformation,
+  EditPen, ChatDotRound // [新增] 引入新图标
 } from '@element-plus/icons-vue'
 import { updatePassword } from '@/api/admin'
 
@@ -162,6 +163,20 @@ const submitPassword = () => {
                 <User />
               </el-icon><span>个人信息</span></el-menu-item>
 
+            <el-sub-menu index="/blog">
+              <template #title>
+                <el-icon><ChatDotRound /></el-icon>
+                <span>心情随笔</span>
+              </template>
+              <el-menu-item index="/article/list">
+                <el-icon><Notebook /></el-icon>
+                <span>往事回忆</span>
+              </el-menu-item>
+              <el-menu-item index="/article/publish">
+                <el-icon><EditPen /></el-icon>
+                <span>记录当下</span>
+              </el-menu-item>
+            </el-sub-menu>
             <el-sub-menu index="/manage1">
               <template #title><el-icon>
                   <Menu />
