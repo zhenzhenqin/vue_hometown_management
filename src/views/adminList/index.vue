@@ -1,22 +1,22 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { 
-  Search, 
-  RefreshLeft, 
-  Plus, 
-  Edit, 
-  UserFilled, 
-  Location, 
-  Key 
+import {
+  Search,
+  RefreshLeft,
+  Plus,
+  Edit,
+  UserFilled,
+  Location,
+  Key
 } from '@element-plus/icons-vue'
 // 引入API (确保你的 api/admin.js 中导出了这些方法)
-import { 
-  getAdminList, 
-  addAdmin, 
-  getAdminById, 
-  updateAdmin, 
-  changeAdminStatus 
+import {
+  getAdminList,
+  addAdmin,
+  getAdminById,
+  updateAdmin,
+  changeAdminStatus
 } from '@/api/admin'
 
 // --- 1. 列表数据 ---
@@ -121,16 +121,16 @@ const handleStatusChange = async (row) => {
 const handleAdd = () => {
   dialogTitle.value = '新增管理员'
   dialogVisible.value = true
-  
+
   // 重置表单
   formData.id = null
   formData.username = ''
-  formData.password = '' 
+  formData.password = ''
   formData.realName = ''
   formData.phone = ''
   formData.email = ''
   formData.status = 1
-  
+
   if (formRef.value) formRef.value.resetFields()
 }
 
@@ -139,7 +139,7 @@ const handleEdit = async (id) => {
   dialogTitle.value = '编辑管理员'
   dialogVisible.value = true
   if (formRef.value) formRef.value.resetFields()
-  
+
   try {
     const res = await getAdminById(id)
     if (res.code === 1) {
@@ -199,13 +199,8 @@ onMounted(() => {
     <el-card class="search-card" shadow="hover">
       <el-form :inline="true" :model="queryParams" class="search-form">
         <el-form-item label="登录账号">
-          <el-input 
-            v-model="queryParams.username" 
-            placeholder="请输入账号" 
-            clearable 
-            @keyup.enter="handleSearch"
-            class="search-input"
-          />
+          <el-input v-model="queryParams.username" placeholder="请输入账号" clearable @keyup.enter="handleSearch"
+            class="search-input" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch" :icon="Search">查询</el-button>
@@ -219,26 +214,23 @@ onMounted(() => {
     </div>
 
     <el-card class="table-card" shadow="hover" :border="false">
-      <el-table 
-        v-loading="loading"
-        :data="tableData" 
-        border 
-        style="width: 100%"
-        :header-cell-style="{ background: '#f9fafb', color: '#4b5563', fontWeight: '600' }"
-      >
+      <el-table v-loading="loading" :data="tableData" border style="width: 100%"
+        :header-cell-style="{ background: '#f9fafb', color: '#4b5563', fontWeight: '600' }">
         <el-table-column type="index" label="序号" width="60" align="center" />
-        
+
         <el-table-column label="登录账号" prop="username" align="center" width="180">
           <template #default="scope">
             <div v-if="scope.row.username === 'admin'" class="super-admin-tag">
-              <el-icon><UserFilled /></el-icon> 超级管理员
+              <el-icon>
+                <UserFilled />
+              </el-icon> 超级管理员
             </div>
             <span v-else class="username-text">{{ scope.row.username }}</span>
           </template>
         </el-table-column>
 
         <el-table-column label="真实姓名" prop="realName" align="center" width="100" />
-        
+
         <el-table-column label="最后登录IP" prop="ip" align="center" width="230">
           <template #default="scope">
             <span class="mono-font">{{ scope.row.ip || '-' }}</span>
@@ -248,26 +240,24 @@ onMounted(() => {
         <el-table-column label="IP归属地" prop="city" align="center" min-width="150" show-overflow-tooltip>
           <template #default="scope">
             <el-tag v-if="scope.row.city" type="info" size="small" effect="light">
-              <el-icon style="vertical-align: middle; margin-right: 2px"><Location /></el-icon>
-              {{ scope.row.city }}
+              <div class="location-box">
+                <el-icon>
+                  <Location />
+                </el-icon>
+                <span class="city-name">{{ scope.row.city }}</span>
+              </div>
             </el-tag>
             <span v-else class="text-gray">-</span>
           </template>
         </el-table-column>
 
         <el-table-column label="手机号码" prop="phone" align="center" width="120" />
-        
+
         <el-table-column label="状态" align="center" width="80">
           <template #default="scope">
-            <el-switch
-              v-model="scope.row.status"
-              :active-value="1"
-              :inactive-value="0"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
-              :disabled="scope.row.username === 'admin'" 
-              @change="handleStatusChange(scope.row)"
-            />
+            <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" active-color="#13ce66"
+              inactive-color="#ff4949" :disabled="scope.row.username === 'admin'"
+              @change="handleStatusChange(scope.row)" />
           </template>
         </el-table-column>
 
@@ -282,13 +272,7 @@ onMounted(() => {
         <el-table-column label="操作" align="center" width="140" fixed="right">
           <template #default="scope">
             <div v-if="scope.row.username !== 'admin'" class="action-buttons">
-              <el-button 
-                type="primary" 
-                link 
-                size="small" 
-                @click="handleEdit(scope.row.id)" 
-                :icon="Edit"
-              >
+              <el-button type="primary" link size="small" @click="handleEdit(scope.row.id)" :icon="Edit">
                 编辑
               </el-button>
             </div>
@@ -299,51 +283,20 @@ onMounted(() => {
     </el-card>
 
     <div class="pagination-bar">
-      <el-pagination
-        v-model:current-page="queryParams.page"
-        v-model:page-size="queryParams.pageSize"
-        :page-sizes="[10, 20, 30, 50]"
-        background
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+      <el-pagination v-model:current-page="queryParams.page" v-model:page-size="queryParams.pageSize"
+        :page-sizes="[10, 20, 30, 50]" background layout="total, sizes, prev, pager, next, jumper" :total="total"
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
 
-    <el-dialog
-      v-model="dialogVisible"
-      :title="dialogTitle"
-      width="500px"
-      :close-on-click-modal="false"
-      destroy-on-close
-    >
-      <el-form 
-        ref="formRef" 
-        :model="formData" 
-        :rules="rules" 
-        label-width="90px" 
-        class="dialog-form"
-      >
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" :close-on-click-modal="false"
+      destroy-on-close>
+      <el-form ref="formRef" :model="formData" :rules="rules" label-width="90px" class="dialog-form">
         <el-form-item label="登录账号" prop="username">
-          <el-input 
-            v-model="formData.username" 
-            placeholder="请输入登录账号" 
-            :disabled="!!formData.id"
-          />
+          <el-input v-model="formData.username" placeholder="请输入登录账号" :disabled="!!formData.id" />
         </el-form-item>
 
-        <el-form-item 
-          label="初始密码" 
-          prop="password" 
-          v-if="!formData.id"
-        >
-          <el-input 
-            v-model="formData.password" 
-            placeholder="请输入初始密码" 
-            type="password" 
-            show-password
-          />
+        <el-form-item label="初始密码" prop="password" v-if="!formData.id">
+          <el-input v-model="formData.password" placeholder="请输入初始密码" type="password" show-password />
         </el-form-item>
 
         <el-form-item label="真实姓名" prop="realName">
@@ -388,11 +341,13 @@ onMounted(() => {
   border-radius: 8px;
   border: none;
 }
+
 .search-form {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
+
 .search-input {
   width: 220px;
 }
@@ -401,6 +356,7 @@ onMounted(() => {
 .operation-bar {
   margin-bottom: 16px;
 }
+
 .add-btn {
   padding: 9px 20px;
 }
@@ -421,6 +377,7 @@ onMounted(() => {
   gap: 4px;
   font-size: 13px;
 }
+
 .username-text {
   font-weight: 500;
   color: #333;
@@ -457,6 +414,7 @@ onMounted(() => {
 .dialog-form {
   padding-right: 20px;
 }
+
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
@@ -470,7 +428,23 @@ onMounted(() => {
   --el-button-hover-bg-color: #2a7d4a;
   --el-button-hover-border-color: #2a7d4a;
 }
+
 :deep(.el-pagination.is-background .el-pager li.is-active) {
   background-color: #1a5e38;
+}
+
+/* 新增样式：强制图标和文字垂直居中 */
+.location-box {
+  display: flex;       /* 开启弹性布局 */
+  align-items: center; /* 垂直居中核心属性 */
+  justify-content: center; /* 水平居中（可选，看你tag内是否需要） */
+  gap: 4px;            /* 图标和文字之间的间距，替代 margin-right */
+  height: 100%;        /* 撑满 tag 的高度 */
+}
+
+/* 微调文字位置，有时候汉字本身自带一点偏上的行高，可以通过这个微调 */
+.city-name {
+  position: relative;
+  top: 1px; /* 如果觉得文字还是偏高，可以尝试加 1px 或 -1px 微调 */
 }
 </style>

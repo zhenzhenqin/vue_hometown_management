@@ -382,8 +382,15 @@ onMounted(fetchUserInfo);
   color: #303133;
 }
 
-.location-badge {
-  border-radius: 10px;
+.location-badge :deep(.el-tag__content) {
+  display: flex;        /* 强制内部内容使用 flex */
+  align-items: center;  /* 强制垂直居中 */
+  height: 100%;         /* 撑满高度 */
+}
+
+/* 如果觉得图标贴得太近，可以单独给图标加个右边距 */
+.location-badge .el-icon {
+  margin-right: 3px; 
 }
 
 .user-info p {

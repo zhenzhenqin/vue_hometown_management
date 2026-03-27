@@ -5,7 +5,7 @@
         <el-icon class="brand-icon"><Reading /></el-icon>
         <div class="brand-text">
           <span class="title">HOMETOWN</span>
-          <span class="version">v1.0.7 Stable</span>
+          <span class="version">v1.0.8 Stable</span>
         </div>
       </div>
       <nav class="toc-wrapper">
@@ -49,14 +49,13 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { Reading } from '@element-plus/icons-vue'
 import { marked } from 'marked'
 import hljs from 'highlight.js'
-// 选用更温和的代码配色方案
 import 'highlight.js/styles/atom-one-dark-reasonable.css'
 
-// --- 📝 项目核心文档 (v1.0.7 Stable) ---
+// --- 📝 项目核心文档 (v1.0.8 Stable) ---
 const markdownContent = `
 # 衢州地区信息管理系统 (Hometown Management System)
 
-> **版本**: v1.0.7 (Stable Build)
+> **版本**: v1.0.8 (Stable Build)
 > **开发者**: mjc (23H034160336)  
 > **状态**: 🟢 已部署 (Stable)
 
@@ -66,7 +65,7 @@ const markdownContent = `
 
 本项目是一个致力于**弘扬衢州文化、推广地方特色**的全栈信息管理平台。系统集成了**文化遗产展示、特产推广、旅游景点导航**以及**后台数据可视化管理**等功能。
 
-**v1.0.7 核心升级**：在 v1.0.6 的基础上，本项目迎来了“理性数据”与“感性文化”的双重进化。新增 **“烂柯·岁月棋局”** 运行中枢，以南孔文化隐喻系统状态；同时上线 **“数据中心”** 模块，实装了 **UV/PV 流量统计**与**地域感知雷达**，实现了从“被动记录”到“主动分析”的跨越。
+**v1.0.8 核心升级**：在 v1.0.7 数据中心的基础上，本项目迎来了“感性体验”的重大进化。全新上线 **“心情随笔 (Emo Notes)”** 模块，引入 **“流态旋转时间轴”** 与 **“沉浸式写作体验”**，让系统不仅仅是一个冷冰冰的管理工具，更是记录岁月与乡愁的容器。
 
 ---
 
@@ -77,7 +76,7 @@ const markdownContent = `
 -   **ORM**: MyBatis / MyBatis-Plus
 -   **数据库**: MySQL 8.0
 -   **IP解析**: **Ip2Region (离线 IP 库，毫秒级查询)**
--   **缓存**: **Redis** (用于会话管理、**UV/PV 统计**与热点数据缓存)
+-   **缓存**: **Redis** (用于会话管理、UV/PV 统计与热点数据缓存)
 -   **安全**: JWT (JSON Web Token) 鉴权
 -   **监控**: OSHI (System Hardware Information) 
 -   **工具**: Swagger/Knife4j, Lombok, FastJSON
@@ -87,8 +86,12 @@ const markdownContent = `
 -   **框架**: Vue 3 (Composition API)
 -   **构建**: Vite 4.x
 -   **UI 组件库**: Element Plus (表格自适应优化)
--   **创意交互**: **Pure CSS Animation** (无图水墨渲染技术) [NEW]
--   **图表**: **ECharts 5.x** (深度集成地图与雷达图)
+-   **编辑器**: **Md-Editor-v3** (Markdown 实时渲染与编辑) [NEW]
+-   **创意交互**: 
+    -   **Pure CSS Animation** (无图水墨渲染)
+    -   **CSS3 3D Transform** (流态时间轴视差滚动) [NEW]
+    -   **Canvas Confetti** (发布撒花特效) [NEW]
+-   **图表**: ECharts 5.x (深度集成地图与雷达图)
 -   **地图**: 百度地图 JavaScript API GL + ECharts GeoJson
 -   **HTTP**: Axios
 
@@ -98,7 +101,7 @@ const markdownContent = `
 
 \`\`\`mermaid
 graph TD
-    User[用户/管理员] -->|登录/操作| Gateway[Nginx / 反向代理]
+    User[用户/管理员] -->|登录/阅读| Gateway[Nginx / 反向代理]
     Gateway --> Server(Spring Boot 后端)
     
     subgraph "核心服务层"
@@ -111,6 +114,7 @@ graph TD
     subgraph "数据与创意层"
     Cache -->|UV/PV| ReportService[报表服务]
     Hardware -->|系统状态| LankeView[烂柯棋局可视化]
+    Server -->|Markdown存储| ArticleService[随笔服务]
     end
 
     subgraph "生产安全层"
@@ -123,7 +127,18 @@ graph TD
 
 ## 4. 核心功能模块 (Modules)
 
-### 📊 数据中心 (Data Center) **[NEW]**
+### 📝 心情随笔 (Mood & Memory) **[NEW]**
+-   **流态旋转时间轴 (Liquid Rotary Timeline)**: 
+    -   摒弃传统列表，采用 **3D 视差滚动** 技术。
+    -   卡片沿中轴线如门扉般优雅旋入，背景伴随流光渐变，营造穿梭时空的视觉体验。
+-   **禅模式写作 (Zen Mode)**:
+    -   后台集成 Markdown 编辑器，支持 **“心情(Mood)”** 选择（开心/Emo/平静/暴躁）。
+    -   发布成功后触发 **Canvas Confetti** 撒花特效，赋予写作仪式感。
+-   **灵感胶囊 (Inspiration Capsule)**:
+    -   前台右下角悬浮的呼吸态按钮，作为进入记忆世界的时空入口。
+-   **沉浸式阅读**: 极简主义排版，根据心情自动适配阅读氛围。
+
+### 📊 数据中心 (Data Center)
 -   **流量分析 (Traffic Analysis)**: 
     -   **PV (Page View)**: 基于 Redis 的原子计数器，实时统计页面访问量。
     -   **UV (Unique Visitor)**: 基于 Redis \`Set\` 结构去重，精确统计每日独立访客数。
@@ -131,7 +146,7 @@ graph TD
     -   **分布地图**: 结合 ECharts 地图组件，直观展示用户来源省份与城市。
     -   **Top 榜单**: 自动计算并展示用户量 Top 10 的活跃城市。
 
-### 🎨 创意交互 (Creative Interaction) **[NEW]**
+### 🎨 创意交互 (Creative Interaction)
 -   **烂柯 · 岁月棋局**: 
     -   **设计理念**: 结合衢州“烂柯山”传说，以棋喻时。
     -   **动态对弈**: 前端算法模拟围棋自动落子，每一手棋代表系统稳定运行的一个心跳。
@@ -209,6 +224,10 @@ location /api/ {
 ---
 
 ## 6. 更新日志 (Changelog)
+
+-   **v1.0.8 (2025-12-30) - The "Soul" Update**:
+    -   ✨ **[Mood]** 全新上线 **“心情随笔”** 系统，支持 Markdown 撰写、心情标记与封面上传。
+    -   🐛 **[Fix]** 修复了 \`el-upload\` 组件在生产环境下的路径 404 问题，优化了拦截器放行策略。
 
 -   **v1.0.7 (2025-12-30)**:
     -   ✨ **[Creative]** 新增 **“烂柯·岁月棋局”** 运行中枢，采用纯 CSS 构建水墨山水背景与自动对弈围棋，以艺术化的方式展示系统状态。

@@ -42,7 +42,7 @@
       <div class="cover-section">
         <el-upload
           class="cover-uploader"
-          action="/api/common/upload"
+          action="/api/upload" 
           :headers="uploadHeaders"
           :show-file-list="false"
           :on-success="handleCoverSuccess"
@@ -74,17 +74,19 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { addArticle, getArticleDetail, updateArticle, uploadArticleImage } from '@/api/article';
+import { addArticle, getArticleDetail, updateArticle } from '@/api/article';
 import { ElMessage } from 'element-plus';
 import confetti from 'canvas-confetti';
+import request from '@/utils/request'; // 直接引入 request 以便编辑器也能用正确的上传路径
 
-// === 引入 md-editor-v3 及其样式 ===
 import { MdEditor } from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 
 const route = useRoute();
 const router = useRouter();
 const loading = ref(false);
+
+// 1. 获取 Token (el-upload 需要手动带 header)
 const token = localStorage.getItem('token');
 const uploadHeaders = { token: token }; 
 
@@ -105,14 +107,12 @@ const form = reactive({
   isPublic: 1
 });
 
-// 编辑器工具栏配置 (按需精简)
 const toolbars = [
   'bold', 'underline', 'italic', '-', 'title', 'strikeThrough', 'sub', 'sup', 'quote', 'unorderedList', 'orderedList', 'task', '-',
   'codeRow', 'code', 'link', 'image', 'table', 'mermaid', 'katex', '-',
   'revoke', 'next', 'save', '=', 'pageFullscreen', 'fullscreen', 'preview', 'htmlPreview', 'catalog'
 ];
 
-// 根据心情动态调整编辑器主题 (可选)
 const isDark = computed(() => ['emo', 'angry'].includes(form.mood));
 const activeMood = computed(() => `mood-${form.mood}`);
 const moodPlaceholder = computed(() => moods.find(m => m.key === form.mood)?.placeholder);
@@ -124,7 +124,34 @@ onMounted(async () => {
   }
 });
 
-// === 处理编辑器图片上传 (md-editor-v3 方式) ===
+// === 2. 封面上传成功回调 (模仿你的景区代码) ===
+const handleCoverSuccess = (response) => {
+  // 你的 UploadController 返回的是 Result.success(url)
+  // 所以 response.code 应该 === 1，response.data 是图片链接
+  if (response.code === 1) {
+    form.coverImg = response.data;
+    ElMessage.success('封面上传成功');
+  } else {
+    ElMessage.error(response.msg || '上传失败');
+  }
+};
+
+// 封面格式校验
+const beforeUpload = (file) => {
+  const isImg = file.type === 'image/jpeg' || file.type === 'image/png';
+  const isLt10M = file.size / 1024 / 1024 < 10;
+  if (!isImg) {
+    ElMessage.error('上传图片只能是 JPG/PNG 格式!');
+    return false;
+  }
+  if (!isLt10M) {
+    ElMessage.error('上传图片大小不能超过 10MB!');
+    return false;
+  }
+  return true;
+};
+
+// === 3. 编辑器内图片上传 (手动调用接口，确保路径也对) ===
 const onUploadImg = async (files, callback) => {
   const res = await Promise.all(
     files.map((file) => {
@@ -132,8 +159,11 @@ const onUploadImg = async (files, callback) => {
         const formData = new FormData();
         formData.append('file', file);
         try {
-          const res = await uploadArticleImage(formData);
-          // 假设后端返回 code=1 且 data 为图片URL
+          // 这里我们直接用 request 发送请求到 /upload，确保和 action 一致
+          const res = await request.post('/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          
           if (res.code === 1) {
             resolve(res.data);
           } else {
@@ -147,24 +177,7 @@ const onUploadImg = async (files, callback) => {
       });
     })
   );
-  
-  // 回调将图片 URL 插入文档
   callback(res);
-};
-
-// 封面上传相关
-const handleCoverSuccess = (res) => {
-  if (res.code === 1) {
-    form.coverImg = res.data;
-    ElMessage.success('封面上传成功');
-  }
-};
-const beforeUpload = (file) => {
-  if (file.size / 1024 / 1024 > 5) {
-    ElMessage.error('图片大小不能超过 5MB!');
-    return false;
-  }
-  return true;
 };
 
 // 发布逻辑
@@ -197,12 +210,12 @@ const triggerConfetti = () => {
 </script>
 
 <style scoped lang="scss">
+/* 样式保持不变 */
 .publish-container {
   min-height: calc(100vh - 60px);
   padding: 20px;
   transition: all 0.5s ease;
   
-  // 不同心情的背景色
   &.mood-happy { background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%); }
   &.mood-emo { background: linear-gradient(to top, #30cfd0 0%, #330867 100%); }
   &.mood-calm { background: linear-gradient(to right, #e0eafc, #cfdef3); }
